@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="${cross_rm} -rf" description="" id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470" name="Debug" optionalBuildProperties="org.eclipse.cdt.docker.launcher.containerbuild.property.selectedvolumes=,org.eclipse.cdt.docker.launcher.containerbuild.property.volumes=" parent="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug">
+					<folderInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470." name="/" resourcePath="">
+						<toolChain id="ilg.gnuarmeclipse.managedbuild.cross.toolchain.elf.debug.1790235992" name="Arm Cross GCC" superClass="ilg.gnuarmeclipse.managedbuild.cross.toolchain.elf.debug">
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash.490157862" name="Create flash image" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting.1945952602" name="Create extended listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize.970849694" name="Print size" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.1357201196" name="Optimization Level" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level" value="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.debug" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.messagelength.1695684332" name="Message length (-fmessage-length=0)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.messagelength" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.signedchar.943581918" name="'char' is signed (-fsigned-char)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.signedchar" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections.827471236" name="Function sections (-ffunction-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections.960245506" name="Data sections (-fdata-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level.1848441320" name="Debug level" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level" value="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level.max" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.format.996279303" name="Debug format" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.format"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.allwarn.831719993" name="Enable all common warnings (-Wall)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.allwarn" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.extrawarn.226975755" name="Enable extra warnings (-Wextra)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.extrawarn" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.unused.1487297378" name="Warn on various unused elements (-Wunused)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.unused" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.uninitialized.660465373" name="Warn on uninitialized variables (-Wuninitialised)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.uninitialized" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.missingdeclaration.2094400733" name="Warn on undeclared global function (-Wmissing-declaration)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.missingdeclaration" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.pointerarith.742088322" name="Warn if pointer arithmetic (-Wpointer-arith)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.pointerarith" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.padded.139757637" name="Warn if padding is included (-Wpadded)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.padded" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.shadow.813227745" name="Warn if shadowed variable (-Wshadow)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.shadow" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.logicalop.620682526" name="Warn if suspicious logical ops (-Wlogical-op)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.logicalop" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.agreggatereturn.341932110" name="Warn if struct is returned (-Wagreggate-return)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.agreggatereturn" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.floatequal.1004180653" name="Warn if floats are compared as equal (-Wfloat-equal)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.floatequal" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.freestanding.1806255991" name="Assume freestanding environment (-ffreestanding)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.freestanding" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.nomoveloopinvariants.707020150" name="Disable loop invariant move (-fno-move-loop-invariants)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.nomoveloopinvariants" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.id.875270955" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.id" value="435435382" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name.1905766367" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name" value="xPack GNU Arm Embedded GCC" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.architecture.1137519557" name="Architecture" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.architecture" value="ilg.gnuarmeclipse.managedbuild.cross.option.architecture.arm" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.family.1100878783" name="Arm family (-mcpu)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.family" value="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.mcpu.cortex-m3" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset.1850211339" name="Instruction set" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset" value="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset.thumb" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix.218430480" name="Prefix" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix" value="arm-none-eabi-" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.c.642030567" name="C compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.c" value="gcc" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp.1730441548" name="C++ compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp" value="g++" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar.1089389929" name="Archiver" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar" value="ar" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy.1507128252" name="Hex/Bin converter" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy" value="objcopy" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.objdump.1396792448" name="Listing generator" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.objdump" value="objdump" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.size.2008769437" name="Size command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.size" value="size" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.make.2038421075" name="Build command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.make" value="make" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.rm.1841105924" name="Remove command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.rm" value="rm" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform.1304710914" isAbstract="false" osList="all" superClass="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform"/>
+							<builder buildPath="${workspace_loc:/uiso}/Debug" id="ilg.gnuarmeclipse.managedbuild.cross.builder.1557972321" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="ilg.gnuarmeclipse.managedbuild.cross.builder"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.121306568" name="GNU Arm Cross Assembler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor.1690351921" name="Use preprocessor" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.include.paths.160240485" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/cmsis&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/EFM32GG390F1024&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emlib/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/gpiointerrupt/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/include/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/sleeptimer/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/power_manager/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/udelay/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/device_init/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/iostream/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/debug/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/button/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/leddrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/ff15/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/dmadrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/spidrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/portable/GCC/ARM_CM3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/simplelink/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/oslib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/http/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/platform}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap/er-coap-13}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap}&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.defs.1429924361" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.defs" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="TRACE"/>
+									<listOptionValue builtIn="false" value="OS_USE_TRACE_ITM"/>
+									<listOptionValue builtIn="false" value="EFM32GG390F1024=1"/>
+									<listOptionValue builtIn="false" value="SL_CATALOG_POWER_MANAGER_PRESENT=1"/>
+									<listOptionValue builtIn="false" value="DEBUG_EFM=1"/>
+									<listOptionValue builtIn="false" value="__OSI__=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_COAP_DEFAULT_BLOCK_SIZE=512"/>
+									<listOptionValue builtIn="false" value="LWM2M_CLIENT_MODE=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_SUPPORT_JSON=1"/>
+								</option>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input.1021486405" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1403720488" name="GNU Arm Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths.1266838262" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths" useByScannerDiscovery="true" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/cmsis&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/EFM32GG390F1024&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emlib/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/gpiointerrupt/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/include/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/sleeptimer/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/power_manager/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/udelay/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/device_init/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/iostream/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/debug/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/button/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/leddrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/ff15/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/dmadrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/spidrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/portable/GCC/ARM_CM3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/simplelink/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/oslib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/http/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/platform}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap/er-coap-13}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap}&quot;"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.missingprototypes.2024443413" name="Warn if a global function has no prototype (-Wmissing-prototypes)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.missingprototypes" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.strictprototypes.1897969768" name="Warn if a function has no arg type (-Wstrict-prototypes)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.strictprototypes" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.badfunctioncast.1069202905" name="Warn if wrong cast  (-Wbad-function-cast)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.badfunctioncast" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs.632533169" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs" useByScannerDiscovery="true" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="TRACE"/>
+									<listOptionValue builtIn="false" value="OS_USE_TRACE_ITM"/>
+									<listOptionValue builtIn="false" value="EFM32GG390F1024=1"/>
+									<listOptionValue builtIn="false" value="SL_CATALOG_POWER_MANAGER_PRESENT=1"/>
+									<listOptionValue builtIn="false" value="__OSI__=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_COAP_DEFAULT_BLOCK_SIZE=512"/>
+									<listOptionValue builtIn="false" value="LWM2M_CLIENT_MODE=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_SUPPORT_JSON=1"/>
+								</option>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.459797532" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.353696569" name="GNU Arm Cross C++ Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths.1393893127" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths" useByScannerDiscovery="true" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/cmsis&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/EFM32GG390F1024&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emlib/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/gpiointerrupt/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/include/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/sleeptimer/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/power_manager/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/udelay/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/device_init/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/iostream/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/debug/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/button/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/leddrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/ff15/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/dmadrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/spidrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/portable/GCC/ARM_CM3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/simplelink/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/oslib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/http/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/platform}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap/er-coap-13}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap}&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs.733399315" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs" useByScannerDiscovery="true" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="TRACE"/>
+									<listOptionValue builtIn="false" value="OS_USE_TRACE_ITM"/>
+									<listOptionValue builtIn="false" value="EFM32GG390F1024=1"/>
+									<listOptionValue builtIn="false" value="SL_CATALOG_POWER_MANAGER_PRESENT=1"/>
+									<listOptionValue builtIn="false" value="__OSI__=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_COAP_DEFAULT_BLOCK_SIZE=512"/>
+									<listOptionValue builtIn="false" value="LWM2M_CLIENT_MODE=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_SUPPORT_JSON=1"/>
+								</option>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.1196673219" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.1050229155" name="GNU Arm Cross C Linker" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.gcsections.267838577" name="Remove unused sections (-Xlinker --gc-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.gcsections" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.paths.435413540" name="Library search path (-L)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;../ldscripts&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.scriptfile.303547764" name="Script files (-T)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.scriptfile" valueType="stringList">
+									<listOptionValue builtIn="false" value="mem.ld"/>
+									<listOptionValue builtIn="false" value="libs.ld"/>
+									<listOptionValue builtIn="false" value="sections.ld"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.nostart.25654627" name="Do not use standard start files (-nostartfiles)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.nostart" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.usenewlibnano.911950076" name="Use newlib-nano (--specs=nano.specs)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.usenewlibnano" value="true" valueType="boolean"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.input.1398008068" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.1728816912" name="GNU Arm Cross C++ Linker" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.gcsections.912583165" name="Remove unused sections (-Xlinker --gc-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.gcsections" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.paths.1081811251" name="Library search path (-L)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;../ldscripts&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.scriptfile.2085678276" name="Script files (-T)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.scriptfile" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="efm32gg.ld"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.nostart.858538079" name="Do not use standard start files (-nostartfiles)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.nostart" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.usenewlibnano.592838623" name="Use newlib-nano (--specs=nano.specs)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.usenewlibnano" value="true" valueType="boolean"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.input.647792089" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver.1730438583" name="GNU Arm Cross Archiver" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.createflash.613529682" name="GNU Arm Cross Create Flash Image" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.createflash"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.createlisting.1157387589" name="GNU Arm Cross Create Listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.createlisting">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.source.1897078922" name="Display source (--source|-S)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.source" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.allheaders.1792801785" name="Display all headers (--all-headers|-x)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.allheaders" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.demangle.1434744743" name="Demangle names (--demangle|-C)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.demangle" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.linenumbers.2101178275" name="Display line numbers (--line-numbers|-l)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.linenumbers" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.wide.707691018" name="Wide lines (--wide|-w)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.wide" value="true" valueType="boolean"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize.1409433285" name="GNU Arm Cross Print Size" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.printsize.format.2074298879" name="Size format" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.printsize.format"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="connectivity"/>
+						<entry excluding="lwm2m/lightclient/lightclient.c|lwm2m/dtlsconnection.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="src/wakaama/examples|src/wakaama/tools|src/wakaama/tests|src/cc3100-sdk/netapps/mqtt|src/cc3100-sdk/netapps/http/client|src/cc3100-sdk/netapps/mqtt/platform/cc32xx_platform.c|src/cc3100-sdk/netapps/mqtt/sl/sl_mqtt_server.c|src/cc3100-sdk/tools|src/cc3100-sdk/simplelink_extlib|src/cc3100-sdk/examples|src/cc3100-sdk/docs|src/cc3100-sdk/platform|src/cc3100-sdk/third_party|src/cmsis/GCC/startup_efm32gg.S|src/FreeRTOS/portable/GCC/RX600v2|src/FreeRTOS/portable/GCC/ARM_CRx_No_GIC|src/FreeRTOS/portable/GCC/ColdFire_V2|src/gecko_sdk/common/src/sl_status.c|src/FreeRTOS/portable/GCC/ARM_CM55_NTZ|src/gecko_sdk/service/legacy_ncp_spi|src/FreeRTOS/portable/GCC/HCS12|src/FreeRTOS/portable/ThirdParty|src/FreeRTOS/portable/GCC/ARM_CM55|src/FreeRTOS/portable/GCC/ARM_CM33|src/gecko_sdk/emdrv/uartdrv|src/FreeRTOS/portable/GCC/AVR_AVRDx|src/gecko_sdk/emdrv/component|src/FreeRTOS/portable/GCC/H8S2329|src/gecko_sdk/common/component_catalog|src/FreeRTOS/portable/GCC/RX600|src/FreeRTOS/portable/GCC/ARM7_AT91FR40008|src/gecko_sdk/emdrv/rtcdrv|src/FreeRTOS/portable/GCC/ARM_CM85_NTZ|src/FreeRTOS/portable/GCC/ARM_CM23|src/gecko_sdk/driver/pwm|src/FreeRTOS/portable/ARMv8M|src/FreeRTOS/portable/GCC/MSP430F449|src/ff15/custom/diskio.c|src/gecko_sdk/emdrv/ustimer|src/FreeRTOS/portable/GCC/ARM7_LPC23xx|src/gecko_sdk/driver/leddrv|src/gecko_sdk/common/toolchain|src/gecko_sdk/service/component|src/gecko_sdk/common/script|src/FreeRTOS/portable/GCC/ARM_CA53_64_BIT_SRE|src/FreeRTOS/portable/RVDS|src/cmsis/startup_efm32gg.S|src/FreeRTOS/portable/CodeWarrior|src/gecko_sdk/service/sim_eeprom|src/gecko_sdk/common/config|src/FreeRTOS/portable/Keil|src/gecko_sdk/service/power_manager|src/gecko_sdk/common/src/sli_cmsis_os2_ext_task_register.c|src/FreeRTOS/portable/GCC/TriCore_1782|src/FreeRTOS/portable/GCC/ARM_CM7|src/gecko_sdk/service/udelay|src/FreeRTOS/portable/IAR|src/gecko_sdk/common/src/sl_string.c|src/gecko_sdk/service/cli_storage|src/FreeRTOS/portable/GCC/PPC405_Xilinx|src/FreeRTOS/portable/GCC/ARM7_LPC2000|src/gecko_sdk/emdrv/tempdrv|src/FreeRTOS/portable/GCC/ARM_CM85|src/FreeRTOS/portable/GCC/STR75x|src/FreeRTOS/portable/oWatcom|src/FreeRTOS/portable/MPLAB|src/FreeRTOS/portable/GCC/RL78|src/gecko_sdk/service/cpc|src/FreeRTOS/portable/GCC/ARM_CA9|src/FreeRTOS/portable/Common|src/ff15/custom/rtc_stm32f1.c|src/FreeRTOS/portable/GCC/CORTUS_APS3|src/cmsis/vectors_EFM32GG390F1024.c|src/ff15/custom/mmc_stm32f1_spi.c|src/FreeRTOS/portable/MSVC-MingW|src/FreeRTOS/portable/GCC/PPC440_Xilinx|src/FreeRTOS/portable/GCC/MicroBlazeV8|src/FreeRTOS/portable/GCC/ARM_CM3_MPU|src/gecko_sdk/driver/i2cspm|src/gecko_sdk/service/system|src/gecko_sdk/service/sleeptimer|src/FreeRTOS/portable/GCC/ATMega323|src/FreeRTOS/portable/MemMang/heap_3.c|src/FreeRTOS/portable/Renesas|src/FreeRTOS/portable/Rowley|src/gecko_sdk/emdrv/spidrv/config|src/gecko_sdk/service/iostream|src/FreeRTOS/portable/MemMang/heap_2.c|src/FreeRTOS/portable/GCC/NiosII|src/gecko_sdk/service/legacy_ncp_ash|src/gecko_sdk/service/mem_pool|src/gecko_sdk/emdrv/ezradiodrv|src/gecko_sdk/service/token_manager|src/gecko_sdk/service/device_init|src/gecko_sdk/service/mpu|src/FreeRTOS/portable/MemMang/heap_5.c|src/FreeRTOS/portable/GCC/MicroBlaze|src/gecko_sdk/emdrv/spidrv/init|src/FreeRTOS/portable/GCC/MicroBlazeV9|src/gecko_sdk/driver/keyscan|src/FreeRTOS/portable/GCC/ARM_CM4_MPU|src/ff15/documents|src/gecko_sdk/driver/coulomb|src/gecko_sdk/service/legacy_host|src/FreeRTOS/portable/GCC/ARM_CR5|src/FreeRTOS/portable/GCC/ARM_CM0|src/FreeRTOS/portable/GCC/MCF5235|src/gecko_sdk/common/src/sl_stdio.c|src/FreeRTOS/portable/ARMClang|src/FreeRTOS/portable/GCC/AVR_Mega0|src/gecko_sdk/emdrv/spidrv/script|src/gecko_sdk/service/hfxo_manager|src/FreeRTOS/portable/GCC/RX100|src/gecko_sdk/driver/component|src/FreeRTOS/portable/GCC/ARM_CM23_NTZ|src/gecko_sdk/common/component|src/gecko_sdk/service/legacy_printf|src/gecko_sdk/service/cli|src/gecko_sdk/emdrv/config|src/gecko_sdk/service/legacy_hal|src/FreeRTOS/portable/BCC|src/gecko_sdk/emdrv/nvm3|src/FreeRTOS/portable/GCC/RX700v3_DPFPU|src/FreeRTOS/portable/GCC/IA32_flat|src/gecko_sdk/driver/mvp|src/FreeRTOS/portable/GCC/ARM_CA53_64_BIT|src/FreeRTOS/portable/GCC/RX200|src/FreeRTOS/portable/SDCC|src/FreeRTOS/portable/Paradigm|src/gecko_sdk/driver/cycle_counter|src/FreeRTOS/portable/CCS|src/FreeRTOS/portable/GCC/RISC-V|src/FreeRTOS/portable/WizC|src/FreeRTOS/portable/GCC/ARM_CM33_NTZ|src/gecko_sdk/service/legacy_common_ash|src/FreeRTOS/portable/Softune|src/FreeRTOS/portable/MemMang/heap_1.c|src/FreeRTOS/portable/GCC/ARM_CM4F|src/FreeRTOS/portable/Tasking|src/gecko_sdk/emdrv/sleep|src/FreeRTOS/portable/GCC/ARM7_AT91SAM7S|src/gecko_sdk/service/event|src/FreeRTOS/portable/GCC/AVR32_UC3|src/gecko_sdk/service/ram_interrupt_vector_init|src/gecko_sdk/service/legacy_hal_wdog|src/FreeRTOS/portable/MikroC" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/driver/leddrv/inc"/>
+						<entry excluding="sl_simple_rgb_pwm_led.c|sl_pwm_led.c|sl_simple_rgbw_pwm_led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/driver/leddrv/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/device_init/inc"/>
+						<entry excluding="sl_device_init_emu_s2.c|sl_device_init_usbpll_s2.c|sl_device_init_hfxo_mgm24.c|sl_device_init_dpll_s2.c|sl_device_init_lfxo_s2.c|sl_device_init_lfxo_s1.c|sl_device_init_dcdc_s1.c|sl_device_init_hfxo_s2.c|sl_device_init_hfxo_s1.c|sl_device_init_dcdc_s2.c|sl_device_init_emu_s1.c|sl_device_init_dcdc_boost_s2.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/device_init/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/iostream/inc"/>
+						<entry excluding="sl_iostream_vuart.c|sl_iostream_usart.c|sl_iostream_uart.c|sl_iostream_rtt.c|sl_iostream_eusart.c|sl_iostream_leuart.c|sl_iostream_stdlib_config.c|sl_iostream_cpc.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/iostream/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/power_manager/inc"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/power_manager/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/sleeptimer/inc"/>
+						<entry excluding="sl_sleeptimer_hal_prortc.c|sl_sleeptimer_hal_sysrtc.c|sl_sleeptimer_hal_rtcc.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/sleeptimer/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/udelay/inc"/>
+						<entry excluding="sl_udelay_armv6m_iar.s" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/udelay/src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="ilg.gnumcueclipse.managedbuild.packs"/>
+		</cconfiguration>
+		<cconfiguration id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="${cross_rm} -rf" description="" id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333" name="Release" optionalBuildProperties="" parent="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release">
+					<folderInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333." name="/" resourcePath="">
+						<toolChain id="ilg.gnuarmeclipse.managedbuild.cross.toolchain.elf.release.680387464" name="Arm Cross GCC" superClass="ilg.gnuarmeclipse.managedbuild.cross.toolchain.elf.release">
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash.733056026" name="Create flash image" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting.1488206293" name="Create extended listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize.920176351" name="Print size" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.1541756238" name="Optimization Level" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level" value="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.size" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.messagelength.2047611218" name="Message length (-fmessage-length=0)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.messagelength" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.signedchar.1818513673" name="'char' is signed (-fsigned-char)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.signedchar" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections.213912138" name="Function sections (-ffunction-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections.347597754" name="Data sections (-fdata-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level.834586245" name="Debug level" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.format.175794619" name="Debug format" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.format"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.allwarn.1706315191" name="Enable all common warnings (-Wall)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.allwarn" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.extrawarn.1807989637" name="Enable extra warnings (-Wextra)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.extrawarn" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.unused.1483295844" name="Warn on various unused elements (-Wunused)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.unused" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.uninitialized.877639993" name="Warn on uninitialized variables (-Wuninitialised)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.uninitialized" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.missingdeclaration.1138041504" name="Warn on undeclared global function (-Wmissing-declaration)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.missingdeclaration" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.pointerarith.471235107" name="Warn if pointer arithmetic (-Wpointer-arith)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.pointerarith" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.padded.1661859932" name="Warn if padding is included (-Wpadded)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.padded" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.shadow.804385344" name="Warn if shadowed variable (-Wshadow)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.shadow" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.logicalop.239320463" name="Warn if suspicious logical ops (-Wlogical-op)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.logicalop" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.agreggatereturn.722641648" name="Warn if struct is returned (-Wagreggate-return)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.agreggatereturn" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.floatequal.1800910444" name="Warn if floats are compared as equal (-Wfloat-equal)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.floatequal" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.freestanding.130869236" name="Assume freestanding environment (-ffreestanding)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.freestanding" value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.id.1642532244" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.id" value="435435382" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name.840395412" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name" value="xPack GNU Arm Embedded GCC" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.architecture.218081123" name="Architecture" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.architecture" value="ilg.gnuarmeclipse.managedbuild.cross.option.architecture.arm" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.family.1511786685" name="Arm family (-mcpu)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.family" value="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.mcpu.cortex-m3" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset.1070143419" name="Instruction set" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset" value="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset.thumb" valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix.1720171783" name="Prefix" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix" value="arm-none-eabi-" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.c.1445256046" name="C compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.c" value="gcc" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp.1143257802" name="C++ compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp" value="g++" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar.2013889532" name="Archiver" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar" value="ar" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy.1858586968" name="Hex/Bin converter" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy" value="objcopy" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.objdump.1585981592" name="Listing generator" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.objdump" value="objdump" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.size.652252153" name="Size command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.size" value="size" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.make.1569762725" name="Build command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.make" value="make" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.rm.280501510" name="Remove command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.rm" value="rm" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform.1516241808" isAbstract="false" osList="all" superClass="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform"/>
+							<builder buildPath="${workspace_loc:/uiso}/Release" id="ilg.gnuarmeclipse.managedbuild.cross.builder.1762466264" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="ilg.gnuarmeclipse.managedbuild.cross.builder"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.1597862411" name="GNU Arm Cross Assembler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor.1848828222" name="Use preprocessor" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.include.paths.334287406" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/cmsis&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/EFM32GG390F1024&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emlib/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/gpiointerrupt/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/include/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/sleeptimer/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/power_manager/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/udelay/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/device_init/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/iostream/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/debug/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/button/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/leddrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/ff15/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/dmadrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/spidrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/portable/GCC/ARM_CM3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/simplelink/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/oslib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/http/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/platform}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap/er-coap-13}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap}&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.defs.98260838" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.defs" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="NDEBUG"/>
+									<listOptionValue builtIn="false" value="EFM32GG390F1024=1"/>
+									<listOptionValue builtIn="false" value="SL_CATALOG_POWER_MANAGER_PRESENT=1"/>
+									<listOptionValue builtIn="false" value="__OSI__=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_COAP_DEFAULT_BLOCK_SIZE=512"/>
+									<listOptionValue builtIn="false" value="LWM2M_CLIENT_MODE=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_SUPPORT_JSON=1"/>
+								</option>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input.796099772" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1781934805" name="GNU Arm Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths.822006565" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths" useByScannerDiscovery="true" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/cmsis&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/EFM32GG390F1024&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emlib/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/gpiointerrupt/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/include/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/sleeptimer/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/power_manager/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/udelay/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/device_init/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/iostream/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/debug/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/button/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/leddrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/ff15/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/dmadrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/spidrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/portable/GCC/ARM_CM3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/simplelink/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/oslib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/http/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/platform}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap/er-coap-13}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap}&quot;"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.missingprototypes.254458041" name="Warn if a global function has no prototype (-Wmissing-prototypes)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.missingprototypes" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.strictprototypes.1210217357" name="Warn if a function has no arg type (-Wstrict-prototypes)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.strictprototypes" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.badfunctioncast.14694565" name="Warn if wrong cast  (-Wbad-function-cast)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.warning.badfunctioncast" useByScannerDiscovery="true" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs.1232462744" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs" useByScannerDiscovery="true" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="NDEBUG"/>
+									<listOptionValue builtIn="false" value="EFM32GG390F1024=1"/>
+									<listOptionValue builtIn="false" value="SL_CATALOG_POWER_MANAGER_PRESENT=1"/>
+									<listOptionValue builtIn="false" value="__OSI__=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_COAP_DEFAULT_BLOCK_SIZE=512"/>
+									<listOptionValue builtIn="false" value="LWM2M_CLIENT_MODE=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_SUPPORT_JSON=1"/>
+								</option>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.296259656" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.1215193725" name="GNU Arm Cross C++ Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths.330536574" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths" useByScannerDiscovery="true" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/cmsis&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../system/include/EFM32GG390F1024&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emlib/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/common/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/gpiointerrupt/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/include/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/sleeptimer/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/power_manager/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/udelay/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/device_init/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/service/iostream/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/debug/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/button/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/driver/leddrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/ff15/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/dmadrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/gecko_sdk/emdrv/spidrv/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/FreeRTOS/portable/GCC/ARM_CM3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/simplelink/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/oslib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/http/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps/mqtt/platform}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/cc3100-sdk/netapps}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap/er-coap-13}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/uiso/system/src/wakaama/coap}&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs.348368277" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs" useByScannerDiscovery="true" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="NDEBUG"/>
+									<listOptionValue builtIn="false" value="EFM32GG390F1024=1"/>
+									<listOptionValue builtIn="false" value="SL_CATALOG_POWER_MANAGER_PRESENT=1"/>
+									<listOptionValue builtIn="false" value="__OSI__=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_COAP_DEFAULT_BLOCK_SIZE=512"/>
+									<listOptionValue builtIn="false" value="LWM2M_CLIENT_MODE=1"/>
+									<listOptionValue builtIn="false" value="LWM2M_SUPPORT_JSON=1"/>
+								</option>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.1080303982" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.291206726" name="GNU Arm Cross C Linker" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.gcsections.678993695" name="Remove unused sections (-Xlinker --gc-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.gcsections" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.paths.1672958930" name="Library search path (-L)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;../ldscripts&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.scriptfile.1418477421" name="Script files (-T)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.scriptfile" valueType="stringList">
+									<listOptionValue builtIn="false" value="mem.ld"/>
+									<listOptionValue builtIn="false" value="libs.ld"/>
+									<listOptionValue builtIn="false" value="sections.ld"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.nostart.847732815" name="Do not use standard start files (-nostartfiles)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.nostart" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.usenewlibnano.1648142379" name="Use newlib-nano (--specs=nano.specs)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.linker.usenewlibnano" value="true" valueType="boolean"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.input.1646135701" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.1329579879" name="GNU Arm Cross C++ Linker" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.gcsections.1320213073" name="Remove unused sections (-Xlinker --gc-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.gcsections" value="true" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.paths.1261520811" name="Library search path (-L)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;../ldscripts&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.scriptfile.2006639276" name="Script files (-T)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.scriptfile" valueType="stringList">
+									<listOptionValue builtIn="false" value="mem.ld"/>
+									<listOptionValue builtIn="false" value="libs.ld"/>
+									<listOptionValue builtIn="false" value="sections.ld"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.nostart.72352440" name="Do not use standard start files (-nostartfiles)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.nostart" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.usenewlibnano.1408723531" name="Use newlib-nano (--specs=nano.specs)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.linker.usenewlibnano" value="true" valueType="boolean"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.input.892259161" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver.1084904246" name="GNU Arm Cross Archiver" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.createflash.355163068" name="GNU Arm Cross Create Flash Image" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.createflash"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.createlisting.327820095" name="GNU Arm Cross Create Listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.createlisting">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.source.110621733" name="Display source (--source|-S)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.source" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.allheaders.379002055" name="Display all headers (--all-headers|-x)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.allheaders" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.demangle.1600083898" name="Demangle names (--demangle|-C)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.demangle" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.linenumbers.1728758561" name="Display line numbers (--line-numbers|-l)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.linenumbers" value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.wide.1219043448" name="Wide lines (--wide|-w)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.createlisting.wide" value="true" valueType="boolean"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize.1601577084" name="GNU Arm Cross Print Size" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.printsize.format.1718005315" name="Size format" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.printsize.format"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="lwm2m/lightclient/lightclient.c|lwm2m/dtlsconnection.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="src/wakaama/examples|src/wakaama/tools|src/wakaama/tests|src/cc3100-sdk/netapps/mqtt|src/cc3100-sdk/netapps/http/client|src/cc3100-sdk/netapps/mqtt/platform/cc32xx_platform.c|src/cc3100-sdk/netapps/mqtt/sl/sl_mqtt_server.c|src/cc3100-sdk/tools|src/cc3100-sdk/simplelink_extlib|src/cc3100-sdk/examples|src/cc3100-sdk/docs|src/cc3100-sdk/platform|src/cc3100-sdk/third_party|src/cmsis/GCC/startup_efm32gg.S|src/FreeRTOS/portable/GCC/RX600v2|src/FreeRTOS/portable/GCC/ARM_CRx_No_GIC|src/FreeRTOS/portable/GCC/ColdFire_V2|src/gecko_sdk/common/src/sl_status.c|src/FreeRTOS/portable/GCC/ARM_CM55_NTZ|src/gecko_sdk/service/legacy_ncp_spi|src/FreeRTOS/portable/GCC/HCS12|src/FreeRTOS/portable/ThirdParty|src/FreeRTOS/portable/GCC/ARM_CM55|src/FreeRTOS/portable/GCC/ARM_CM33|src/gecko_sdk/emdrv/uartdrv|src/FreeRTOS/portable/GCC/AVR_AVRDx|src/gecko_sdk/emdrv/component|src/FreeRTOS/portable/GCC/H8S2329|src/gecko_sdk/common/component_catalog|src/FreeRTOS/portable/GCC/RX600|src/FreeRTOS/portable/GCC/ARM7_AT91FR40008|src/gecko_sdk/emdrv/rtcdrv|src/FreeRTOS/portable/GCC/ARM_CM85_NTZ|src/FreeRTOS/portable/GCC/ARM_CM23|src/gecko_sdk/driver/pwm|src/FreeRTOS/portable/ARMv8M|src/FreeRTOS/portable/GCC/MSP430F449|src/ff15/custom/diskio.c|src/gecko_sdk/emdrv/ustimer|src/FreeRTOS/portable/GCC/ARM7_LPC23xx|src/gecko_sdk/driver/leddrv|src/gecko_sdk/common/toolchain|src/gecko_sdk/service/component|src/gecko_sdk/common/script|src/FreeRTOS/portable/GCC/ARM_CA53_64_BIT_SRE|src/FreeRTOS/portable/RVDS|src/cmsis/startup_efm32gg.S|src/FreeRTOS/portable/CodeWarrior|src/gecko_sdk/service/sim_eeprom|src/gecko_sdk/common/config|src/FreeRTOS/portable/Keil|src/gecko_sdk/service/power_manager|src/gecko_sdk/common/src/sli_cmsis_os2_ext_task_register.c|src/FreeRTOS/portable/GCC/TriCore_1782|src/FreeRTOS/portable/GCC/ARM_CM7|src/gecko_sdk/service/udelay|src/FreeRTOS/portable/IAR|src/gecko_sdk/common/src/sl_string.c|src/gecko_sdk/service/cli_storage|src/FreeRTOS/portable/GCC/PPC405_Xilinx|src/FreeRTOS/portable/GCC/ARM7_LPC2000|src/gecko_sdk/emdrv/tempdrv|src/FreeRTOS/portable/GCC/ARM_CM85|src/FreeRTOS/portable/GCC/STR75x|src/FreeRTOS/portable/oWatcom|src/FreeRTOS/portable/MPLAB|src/FreeRTOS/portable/GCC/RL78|src/gecko_sdk/service/cpc|src/FreeRTOS/portable/GCC/ARM_CA9|src/FreeRTOS/portable/Common|src/ff15/custom/rtc_stm32f1.c|src/FreeRTOS/portable/GCC/CORTUS_APS3|src/cmsis/vectors_EFM32GG390F1024.c|src/ff15/custom/mmc_stm32f1_spi.c|src/FreeRTOS/portable/MSVC-MingW|src/FreeRTOS/portable/GCC/PPC440_Xilinx|src/FreeRTOS/portable/GCC/MicroBlazeV8|src/FreeRTOS/portable/GCC/ARM_CM3_MPU|src/gecko_sdk/driver/i2cspm|src/gecko_sdk/service/system|src/gecko_sdk/service/sleeptimer|src/FreeRTOS/portable/GCC/ATMega323|src/FreeRTOS/portable/MemMang/heap_3.c|src/FreeRTOS/portable/Renesas|src/FreeRTOS/portable/Rowley|src/gecko_sdk/emdrv/spidrv/config|src/gecko_sdk/service/iostream|src/FreeRTOS/portable/MemMang/heap_2.c|src/FreeRTOS/portable/GCC/NiosII|src/gecko_sdk/service/legacy_ncp_ash|src/gecko_sdk/service/mem_pool|src/gecko_sdk/emdrv/ezradiodrv|src/gecko_sdk/service/token_manager|src/gecko_sdk/service/device_init|src/gecko_sdk/service/mpu|src/FreeRTOS/portable/MemMang/heap_5.c|src/FreeRTOS/portable/GCC/MicroBlaze|src/gecko_sdk/emdrv/spidrv/init|src/FreeRTOS/portable/GCC/MicroBlazeV9|src/gecko_sdk/driver/keyscan|src/FreeRTOS/portable/GCC/ARM_CM4_MPU|src/ff15/documents|src/gecko_sdk/driver/coulomb|src/gecko_sdk/service/legacy_host|src/FreeRTOS/portable/GCC/ARM_CR5|src/FreeRTOS/portable/GCC/ARM_CM0|src/FreeRTOS/portable/GCC/MCF5235|src/gecko_sdk/common/src/sl_stdio.c|src/FreeRTOS/portable/ARMClang|src/FreeRTOS/portable/GCC/AVR_Mega0|src/gecko_sdk/emdrv/spidrv/script|src/gecko_sdk/service/hfxo_manager|src/FreeRTOS/portable/GCC/RX100|src/gecko_sdk/driver/component|src/FreeRTOS/portable/GCC/ARM_CM23_NTZ|src/gecko_sdk/common/component|src/gecko_sdk/service/legacy_printf|src/gecko_sdk/service/cli|src/gecko_sdk/emdrv/config|src/gecko_sdk/service/legacy_hal|src/FreeRTOS/portable/BCC|src/gecko_sdk/emdrv/nvm3|src/FreeRTOS/portable/GCC/RX700v3_DPFPU|src/FreeRTOS/portable/GCC/IA32_flat|src/gecko_sdk/driver/mvp|src/FreeRTOS/portable/GCC/ARM_CA53_64_BIT|src/FreeRTOS/portable/GCC/RX200|src/FreeRTOS/portable/SDCC|src/FreeRTOS/portable/Paradigm|src/gecko_sdk/driver/cycle_counter|src/FreeRTOS/portable/CCS|src/FreeRTOS/portable/GCC/RISC-V|src/FreeRTOS/portable/WizC|src/FreeRTOS/portable/GCC/ARM_CM33_NTZ|src/gecko_sdk/service/legacy_common_ash|src/FreeRTOS/portable/Softune|src/FreeRTOS/portable/MemMang/heap_1.c|src/FreeRTOS/portable/GCC/ARM_CM4F|src/FreeRTOS/portable/Tasking|src/gecko_sdk/emdrv/sleep|src/FreeRTOS/portable/GCC/ARM7_AT91SAM7S|src/gecko_sdk/service/event|src/FreeRTOS/portable/GCC/AVR32_UC3|src/gecko_sdk/service/ram_interrupt_vector_init|src/gecko_sdk/service/legacy_hal_wdog|src/FreeRTOS/portable/MikroC" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/driver/leddrv/inc"/>
+						<entry excluding="sl_simple_rgb_pwm_led.c|sl_pwm_led.c|sl_simple_rgbw_pwm_led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/driver/leddrv/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/device_init/inc"/>
+						<entry excluding="sl_device_init_emu_s2.c|sl_device_init_usbpll_s2.c|sl_device_init_hfxo_mgm24.c|sl_device_init_dpll_s2.c|sl_device_init_lfxo_s2.c|sl_device_init_lfxo_s1.c|sl_device_init_dcdc_s1.c|sl_device_init_hfxo_s2.c|sl_device_init_hfxo_s1.c|sl_device_init_dcdc_s2.c|sl_device_init_emu_s1.c|sl_device_init_dcdc_boost_s2.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/device_init/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/iostream/inc"/>
+						<entry excluding="sl_iostream_vuart.c|sl_iostream_usart.c|sl_iostream_uart.c|sl_iostream_rtt.c|sl_iostream_eusart.c|sl_iostream_leuart.c|sl_iostream_stdlib_config.c|sl_iostream_cpc.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/iostream/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/power_manager/inc"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/power_manager/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/sleeptimer/inc"/>
+						<entry excluding="sl_sleeptimer_hal_prortc.c|sl_sleeptimer_hal_sysrtc.c|sl_sleeptimer_hal_rtcc.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/sleeptimer/src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/udelay/inc"/>
+						<entry excluding="sl_udelay_armv6m_iar.s" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system/src/gecko_sdk/service/udelay/src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="uiso.ilg.gnuarmeclipse.managedbuild.cross.target.elf.519929683" name="Executable" projectType="ilg.gnuarmeclipse.managedbuild.cross.target.elf"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/uiso"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/uiso"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1403720488;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.459797532">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333;ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333.;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.1215193725;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.1080303982">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.81498470.;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.353696569;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.1196673219">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333;ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.141099333.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1781934805;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.296259656">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>

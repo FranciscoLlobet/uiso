@@ -1,0 +1,24 @@
+peripherals:
+  spi:
+    - spi1
+    - spi2
+    - spi3
+  gpio:
+    - 
+    - 
+    -
+  i2c:
+    bus: IC0
+  
+  
+  usb:
+
+  
+
+devices:
+  
+
+wifi:
+    
+  
+  

@@ -1,0 +1,229 @@
+/*
+ * board.h
+ *
+ *  Created on: 8 nov 2022
+ *      Author: Francisco
+ */
+
+#ifndef BOARD_H_
+#define BOARD_H_
+
+#include "em_device.h"
+#include "em_chip.h"
+#include "em_msc.h"
+#include "em_cmu.h"
+#include "em_gpio.h"
+#include "gpiointerrupt.h"
+#include "spidrv.h"
+
+/* Adding LEDs and Buttons */
+#include "sl_button.h"
+#include "sl_led.h"
+
+/* Include us delay */
+#include "sl_udelay.h"
+
+#define BOARD_SYSTICK_FREQUENCY    (1000)
+
+/* LEDs */
+#define BOARD_LED_ORANGE_PIN	(1)
+#define BOARD_LED_ORANGE_PORT   (gpioPortB)
+#define BOARD_LED_ORANGE_MODE   (gpioModePushPull)
+#define BOARD_LED_ORANGE_INIT   (0)
+
+#define BOARD_LED_RED_PIN       (12)
+#define BOARD_LED_RED_PORT      (gpioPortA)
+#define BOARD_LED_RED_MODE   (gpioModePushPull)
+#define BOARD_LED_RED_INIT      (0)
+
+#define BOARD_LED_YELLOW_PIN    (0)
+#define BOARD_LED_YELLOW_PORT	(gpioPortB)
+#define BOARD_LED_YELLOW_MODE   (gpioModePushPull)
+#define BOARD_LED_YELLOW_INIT   (0)
+
+/* Buttons */
+#define BOARD_BUTTON1_PIN       (9)
+#define BOARD_BUTTON1_PORT      (gpioPortE)
+#define BOARD_BUTTON1_MODE      (gpioModeInputPullFilter)
+#define BOARD_BUTTON1_INIT      (1)
+
+#define BOARD_BUTTON2_PIN       (14)
+#define BOARD_BUTTON2_PORT      (gpioPortE)
+#define BOARD_BUTTON2_MODE      (gpioModeInputPullFilter)
+#define BOARD_BUTTON2_INIT		(1)
+
+/* SD CARD */
+
+#define BOARD_SD_CARD_USART      		USART1
+#define BOARD_SD_CARD_BITRATE     		UINT32_C(10000000)
+#define BOARD_SD_CARD_WAKEUP_BITRATE       UINT32_C(100000)
+
+#define SD_CARD_CS_PIN         (15)
+#define SD_CARD_CS_PORT        (gpioPortB)
+#define SD_CARD_CS_MODE        (gpioModeWiredAnd)
+
+#define SD_CARD_LS_PIN         (7)
+#define SD_CARD_LS_PORT        (gpioPortC)
+#define SD_CARD_LS_MODE        (gpioModeWiredAnd)
+
+#define SD_DETECT_PIN            (12)
+#define SD_DETECT_PORT           (gpioPortF)
+#define SD_DETECT_MODE           (gpioModeInputPullFilter)
+#define SD_DETECT_EDGE_RISING    true
+#define SD_DETECT_EDGE_FALLING   true
+
+#define SD_CARD_SPI1_MISO_PIN       (1)
+#define SD_CARD_SPI1_MISO_PORT      (gpioPortD)
+#define SD_CARD_SPI1_MISO_MODE      (gpioModeInput)
+
+#define SD_CARD_SPI1_MOSI_PIN      (0)
+#define SD_CARD_SPI1_MOSI_PORT     (gpioPortD)
+#define SD_CARD_SPI1_MOSI_MODE     (gpioModePushPull)
+
+#define SD_CARD_SPI1_SCK_PIN       (2)
+#define SD_CARD_SPI1_SCK_PORT      (gpioPortD)
+#define SD_CARD_SPI1_SCK_MODE      (gpioModePushPull)
+
+#define PWR_2V5_SNOOZE_PIN       (5)
+#define PWR_2V5_SNOOZE_PORT         (gpioPortF)
+#define PWR_2V5_SNOOZE_MODE          (gpioModeWiredOr)
+
+#define PWR_3V3_EN_PIN                                                          (11)
+#define PWR_3V3_EN_PORT                                                         (gpioPortC)
+#define PWR_3V3_EN_MODE                                                         (gpioModePushPull)
+
+/* CC3100 */
+#define WIFI_SERIAL_PORT         USART0
+#define WIFI_SPI_BAUDRATE	     UINT32_C(10000000)
+
+#define WIFI_SUPPLY_SETTING_DELAY_MS                                            UINT32_C(3)// typical value from vendor datasheet
+#define WIFI_PWRON_HW_WAKEUP_DELAY_MS                                           UINT32_C(25)// typical value from vendor datasheet
+#define WIFI_INIT_DELAY_MS                                                      UINT32_C(1350)// typical value from vendor datasheet
+#define WIFI_MIN_HIB_DELAY_MS                                                   UINT32_C(10)// typical value from vendor datasheet
+#define WIFI_HIB_WAKEUP_DELAY_MS                                                UINT32_C(50)// typical value from vendor datasheet
+#define WIFI_MIN_RESET_DELAY_MS                                                 UINT32_C(5)// typical value from vendor datasheet
+#define WIFI_POWER_OFF_DELAY_MS                                                 UINT32_C(20)// typical value from vendor datasheet
+
+#define VDD_WIFI_EN_PIN                                                         (8)
+#define VDD_WIFI_EN_PORT                                                        (gpioPortA)
+#define VDD_WIFI_EN_MODE                                                        (gpioModePushPull)
+
+#define WIFI_CSN_PIN                                                            (5)
+#define WIFI_CSN_PORT                                                           (gpioPortC)
+#define WIFI_CSN_MODE                                                           (gpioModePushPull)
+
+#define WIFI_INT_PIN                                                            (10)
+#define WIFI_INT_PORT                                                           (gpioPortA)
+#define WIFI_INT_MODE                                                           (gpioModeInput)
+#define WIFI_INT_EDGE_RISING                                                    true
+#define WIFI_INT_EDGE_FALLING                                                   false
+
+#define WIFI_NHIB_PIN                                                           (11)
+#define WIFI_NHIB_PORT                                                          (gpioPortA)
+#define WIFI_NHIB_MODE                                                          (gpioModePushPull)
+
+#define WIFI_NRESET_PIN                                                         (15)
+#define WIFI_NRESET_PORT                                                        (gpioPortA)
+#define WIFI_NRESET_MODE                                                        (gpioModeWiredAnd)
+
+#define WIFI_SPI0_MISO_PIN                                                      (11)
+#define WIFI_SPI0_MISO_PORT                                                     (gpioPortE)
+#define WIFI_SPI0_MISO_MODE                                                     (gpioModeInput)
+
+#define WIFI_SPI0_MOSI_PIN                                                      (10)
+#define WIFI_SPI0_MOSI_PORT                                                     (gpioPortE)
+#define WIFI_SPI0_MOSI_MODE                                                     (gpioModePushPull)
+
+#define WIFI_SPI0_SCK_PIN                                                       (12)
+#define WIFI_SPI0_SCK_PORT                                                      (gpioPortE)
+#define WIFI_SPI0_SCK_MODE                                                      (gpioModePushPull)
+
+enum Board_LED_State
+{
+	Board_LED_ON = 1, BoarD_LED_OFF = 0
+};
+
+enum Board_LED_Color_E
+{
+	Board_LED_Red = (1 << 0), Board_LED_Yellow = (1 << 1), Board_LED_Orange = (1
+			<< 2)
+};
+
+enum Board_2V5_State
+{
+	Board_2V5_OFF = 0, Board_2V5_ON = 1
+};
+
+/* MASKS */
+#define BOARD_2V5_MCU_MASK		  UINT32_C(1 << 0)
+#define BOARD_2V5_EM9301_MASK     UINT32_C(1 << 1)
+#define BOARD_2V5_CC31MOD_MASK	  UINT32_C(1 << 2)
+#define BOARD_2V5_SD_CARD_MASK	  UINT32_C(1 << 3)
+#define BOARD_2V5_LED_RED_MASK    UINT32_C(1 << 4)
+#define BOARD_2V5_LED_ORANGE_MASK UINT32_C(1 << 5)
+#define BOARD_2V5_LED_YELLOW_MASK UINT32_C(1 << 6)
+#define BOARD_2V5_BMA280_MASK     UINT32_C(1 << 7)
+#define BOARD_2V5_BMG160_MASK     UINT32_C(1 << 8)
+#define BOARD_2V5_BME280_MASK     UINT32_C(1 << 9)
+#define BOARD_2V5_BMI150_MASK     UINT32_C(1 << 10)
+#define BOARD_2V5_MAX44009_MASK   UINT32_C(1 << 11)
+#define BOARD_2V5_BMI160_MASK     UINT32_C(1 << 12)
+#define BOARD_2V5_AKU340_MASK     UINT32_C(1 << 13)
+
+enum Board_2V5_Peripherals_E
+{
+	Board_2V5_Microcontroller = BOARD_2V5_MCU_MASK,
+	Board_2V5_EM9301 = BOARD_2V5_EM9301_MASK,
+	Board_2V5_CC3100MOD = BOARD_2V5_CC31MOD_MASK,
+	Board_2V3_SD_Card = BOARD_2V5_SD_CARD_MASK,
+	Board_2V5_LED_Red = BOARD_2V5_LED_RED_MASK,
+	Board_2V5_LED_Orange = BOARD_2V5_LED_ORANGE_MASK,
+	Board_2V5_LED_Yellow = BOARD_2V5_LED_YELLOW_MASK,
+
+	/* Implemented in the future */
+	Board_2V5_BMA280 = BOARD_2V5_BMA280_MASK,
+	Board_2V5_BMG160 = BOARD_2V5_BMG160_MASK,
+	Board_2V5_BME280 = BOARD_2V5_BME280_MASK,
+	Board_2V5_BMI150 = BOARD_2V5_BMI150_MASK,
+	Board_2V5_MAX44009 = BOARD_2V5_MAX44009_MASK,
+	Board_2V5_BMI160 = BOARD_2V5_BMI160_MASK,
+	Board_2V5_AKU340 = BOARD_2V5_AKU340_MASK,
+
+	Board_2V5_Extension,
+};
+
+/* Board SysTick Enable */
+void BOARD_SysTick_Enable(void);
+void BOARD_SysTick_Disable(void);
+
+/* Delay function */
+void BOARD_usDelay(uint32_t delay_in_us);
+void BOARD_msDelay(uint32_t delay_in_ms);
+
+void BOARD_SD_Card_Init(void);
+void BOARD_SD_Card_Enable(void);
+void BOARD_SD_Card_Disable(void);
+
+void BOARD_SD_CARD_Select(void);
+void BOARD_SD_CARD_Deselect(void);
+void BOARD_SD_CARD_SetFastBaudrate(void);
+void BOARD_SD_CARD_SetSlowBaudrate(void);
+uint32_t BOARD_SD_CARD_Send(const void *buffer, int count);
+uint32_t BOARD_SD_CARD_Recieve(void *buffer, int count);
+
+/* Button group */
+extern sl_button_t button1;
+extern sl_button_t button2;
+
+/* LED group */
+extern sl_led_t led_red;
+extern sl_led_t led_orange;
+extern sl_led_t led_yellow;
+
+/* SD Card group */
+extern SPIDRV_HandleData_t sd_card_usart;
+extern SPIDRV_HandleData_t cc3100_usart;
+
+//extern SPIDRV_HandleData_t wifi_usart;
+
+#endif /* BOARD_H_ */
