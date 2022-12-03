@@ -64,7 +64,6 @@ struct ntp_packet_s* create_sntp_client_request(struct ntp_packet_s *ntp_packet,
 	return ntp_packet;
 }
 
-#include "socket.h"
 #include "sl_sleeptimer.h"
 
 const char *const ntp_kiss_codes[] =

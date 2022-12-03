@@ -33,7 +33,7 @@
 // <1=> Fast mode (400kbit/s)
 // <2=> Fast mode plus (1Mbit/s)
 // <i> Default: 0
-#define SL_I2CSPM_INSTANCE_SPEED_MODE      0
+#define SL_I2CSPM_INSTANCE_SPEED_MODE      1
 // </h> end I2CSPM config
 
 // <<< end of configuration section >>>
@@ -41,16 +41,16 @@
 // <<< sl:start pin_tool >>>
 // <i2c signal=SCL,SDA> SL_I2CSPM_INSTANCE
 // $[I2C_SL_I2CSPM_INSTANCE]
-#warning "I2CSPM I2C peripheral not configured"
-// #define SL_I2CSPM_INSTANCE_PERIPHERAL      I2C0
 
-// #define SL_I2CSPM_INSTANCE_SCL_PORT        gpioPortC
-// #define SL_I2CSPM_INSTANCE_SCL_PIN         5
+#define SL_I2CSPM_INSTANCE_PERIPHERAL      I2C0
 
-// #define SL_I2CSPM_INSTANCE_SDA_PORT        gpioPortC
-// #define SL_I2CSPM_INSTANCE_SDA_PIN         4
+#define SL_I2CSPM_INSTANCE_SCL_PORT        gpioPortD
+#define SL_I2CSPM_INSTANCE_SCL_PIN         15
 
-// #define SL_I2CSPM_INSTANCE_ROUTE_LOC       0
+#define SL_I2CSPM_INSTANCE_SDA_PORT        gpioPortD
+#define SL_I2CSPM_INSTANCE_SDA_PIN         14
+
+#define SL_I2CSPM_INSTANCE_ROUTE_LOC       3
 
 // [I2C_SL_I2CSPM_INSTANCE]$
 // <<< sl:end pin_tool >>>

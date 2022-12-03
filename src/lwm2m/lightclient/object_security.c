@@ -47,64 +47,138 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "mbedtls/base64.h"
+
+enum{
+	lwm2m_security_uri = LWM2M_SECURITY_URI_ID,
+	lwm2m_security_bootstrap = LWM2M_SECURITY_BOOTSTRAP_ID,
+	lwm2m_security_mode = LWM2M_SECURITY_SECURITY_ID,
+	lwm2m_security_own_public_identity = LWM2M_SECURITY_PUBLIC_KEY_ID,
+	lwm2m_security_server_public_key = LWM2M_SECURITY_SERVER_PUBLIC_KEY_ID,
+	lwm2m_security_own_secret_key = LWM2M_SECURITY_SECRET_KEY_ID,
+	lwm2m_security_sms_security_mode = LWM2M_SECURITY_SMS_SECURITY_ID,
+	lwm2m_security_sms_key_binding = LWM2M_SECURITY_SMS_KEY_PARAM_ID,
+	lwm2m_security_sms_secret_key = LWM2M_SECURITY_SMS_SECRET_KEY_ID,
+	lwm2m_security_sms_server_number = LWM2M_SECURITY_SMS_SERVER_NUMBER_ID,
+	lwm2m_short_server_id = LWM2M_SECURITY_SHORT_SERVER_ID,
+	lwm2m_client_hold_off_time = LWM2M_SECURITY_HOLD_OFF_ID,
+	lwm2m_boostrap_server_timeout = LWM2M_SECURITY_BOOTSTRAP_TIMEOUT_ID,
+
+	/* Security v1.1 extensions */
+	lwm2m_matching_type = 13,
+	lwm2m_server_name_indication = 14,
+	lwm2m_certificate_usage = 15,
+	lwm2m_dtls_tls_ciphersuite =  16,
+	lwm2m_oscore_security_mode = 17,
+};
+
+enum lwm2m_security_mode_e {
+	security_mode_psk = LWM2M_SECURITY_MODE_PRE_SHARED_KEY,
+	security_mode_rpk = LWM2M_SECURITY_MODE_RAW_PUBLIC_KEY,
+	security_mode_certificate = LWM2M_SECURITY_MODE_CERTIFICATE,
+	security_mode_no_sec = LWM2M_SECURITY_MODE_NONE,
+	security_mode_est = 4
+};
+
+enum {
+	matching_type_exact_match = 0,
+	matching_type_exact_sha256 = 1,
+	matching_type_exact_sha384 = 2,
+	matching_type_exact_sha512 = 3,
+};
+
+const char default_server_uri[] = "coaps://192.168.16.103:5684";
+const char default_psk_id[] = "8af526a6-6766-11ed-9022-0242ac120002";
+const uint8_t default_psk[] = "cCn4e/HZ3qDE/OZHCww0bA==";
+
 typedef struct _security_instance_
 {
     struct _security_instance_ * next;        // matches lwm2m_list_t::next
     uint16_t                     instanceId;  // matches lwm2m_list_t::id
-    char *                       uri;
-    bool                         isBootstrap;
+    char                         uri[256];    // Server URI (255 Bytes) as COAP URI
+    bool                         isBootstrap; // Is bootstrap
+    uint32_t					 security_mode;
+
+    char                         public_identity[128]; // rfc4279
+    size_t  					 public_identity_len;
+
+    uint8_t *                    server_identity;
+    size_t                       server_identity_len;
+
+    uint8_t                      secret_key[64]; // rfc4279
+    size_t                       secret_key_len;
+
     uint16_t                     shortID;
     uint32_t                     clientHoldOffTime;
 } security_instance_t;
 
+
+
+
+
 static uint8_t prv_get_value(lwm2m_data_t * dataP,
                              security_instance_t * targetP)
 {
+	uint8_t ret = COAP_404_NOT_FOUND;
 
     switch (dataP->id)
     {
-    case LWM2M_SECURITY_URI_ID:
+    case lwm2m_security_uri:
         lwm2m_data_encode_string(targetP->uri, dataP);
-        return COAP_205_CONTENT;
-
-    case LWM2M_SECURITY_BOOTSTRAP_ID:
+        ret = COAP_205_CONTENT;
+        break;
+    case lwm2m_security_bootstrap:
         lwm2m_data_encode_bool(targetP->isBootstrap, dataP);
-        return COAP_205_CONTENT;
-
-    case LWM2M_SECURITY_SECURITY_ID:
+        ret = COAP_205_CONTENT;
+        break;
+    case lwm2m_security_mode:
+    	lwm2m_data_encode_int((int64_t)targetP->security_mode, dataP);
+        ret = COAP_205_CONTENT;
+        break;
+    case lwm2m_security_own_public_identity:
+    	if(targetP->public_identity_len > 0)
+    	{
+    		lwm2m_data_encode_opaque((uint8_t *)targetP->public_identity, targetP->public_identity_len, dataP);
+    		ret = COAP_205_CONTENT;
+    	}
+    	else
+    	{
+      		uint8_t value_zero = 0;
+       		lwm2m_data_encode_opaque(&value_zero, 1, dataP);
+       		ret =  COAP_205_CONTENT;
+    	}
+        break;
+    case lwm2m_security_server_public_key:
+      	if(targetP->server_identity_len > 0)
+       	{
+       		lwm2m_data_encode_opaque(targetP->server_identity, targetP->server_identity_len, dataP);
+       		ret =  COAP_205_CONTENT;
+       	}
+      	else
+      	{
+      		uint8_t value_zero = 0;
+       		lwm2m_data_encode_opaque(&value_zero, 1, dataP);
+       		ret =  COAP_205_CONTENT;
+      	}
+      	break;
+    case lwm2m_security_own_secret_key:
+        // Here we return an opaque of 1 byte containing 0
+    	if(targetP->secret_key_len > 0)
+    	{
+    		lwm2m_data_encode_opaque(targetP->secret_key, targetP->secret_key_len, dataP);
+    		ret = COAP_205_CONTENT;
+    	}
+    	else
+    	{
+    		uint8_t value_zero = 0;
+    		lwm2m_data_encode_opaque(&value_zero, 1, dataP);
+    		ret = COAP_205_CONTENT;
+    	}
+    	break;
+    case lwm2m_security_sms_security_mode:
         lwm2m_data_encode_int(LWM2M_SECURITY_MODE_NONE, dataP);
         return COAP_205_CONTENT;
 
-    case LWM2M_SECURITY_PUBLIC_KEY_ID:
-        // Here we return an opaque of 1 byte containing 0
-        {
-            uint8_t value = 0;
-
-            lwm2m_data_encode_opaque(&value, 1, dataP);
-        }
-        return COAP_205_CONTENT;
-
-    case LWM2M_SECURITY_SERVER_PUBLIC_KEY_ID:
-        // Here we return an opaque of 1 byte containing 0
-        {
-            uint8_t value = 0;
-
-            lwm2m_data_encode_opaque(&value, 1, dataP);
-        }
-        return COAP_205_CONTENT;
-
-    case LWM2M_SECURITY_SECRET_KEY_ID:
-        // Here we return an opaque of 1 byte containing 0
-        {
-            uint8_t value = 0;
-
-            lwm2m_data_encode_opaque(&value, 1, dataP);
-        }
-        return COAP_205_CONTENT;
-
-    case LWM2M_SECURITY_SMS_SECURITY_ID:
-        lwm2m_data_encode_int(LWM2M_SECURITY_MODE_NONE, dataP);
-        return COAP_205_CONTENT;
 
     case LWM2M_SECURITY_SMS_KEY_PARAM_ID:
         // Here we return an opaque of 6 bytes containing a buggy value
@@ -135,8 +209,10 @@ static uint8_t prv_get_value(lwm2m_data_t * dataP,
         return COAP_205_CONTENT;
 
     default:
-        return COAP_404_NOT_FOUND;
+        ret = COAP_404_NOT_FOUND;
     }
+
+    return ret;
 }
 
 static uint8_t prv_security_read(lwm2m_context_t * contextP,
@@ -211,6 +287,8 @@ lwm2m_object_t * get_security_object()
         memset(securityObj, 0, sizeof(lwm2m_object_t));
 
         securityObj->objID = 0;
+        securityObj->versionMajor = 1;
+        securityObj->versionMinor = 1;
 
         // Manually create an hardcoded instance
         targetP = (security_instance_t *)lwm2m_malloc(sizeof(security_instance_t));
@@ -222,16 +300,26 @@ lwm2m_object_t * get_security_object()
 
         memset(targetP, 0, sizeof(security_instance_t));
         targetP->instanceId = 0;
-        targetP->uri = lwm2m_malloc(64);
-        strncpy(targetP->uri, "coap://leshan.eclipseprojects.io:5683", 64);
-        //targetP->uri = strdup("coap://leshan.eclipseprojects.io:5683");
+
+        strncpy(targetP->uri, default_server_uri, strlen(default_server_uri));
+        strncpy(targetP->public_identity, default_psk_id, strlen(default_psk_id));
+        targetP->public_identity_len = strlen(targetP->public_identity) + 1;
+        mbedtls_base64_decode((unsigned char *)&(targetP->secret_key), sizeof(targetP->secret_key), &(targetP->secret_key_len), default_psk, strlen(default_psk));
+
         targetP->isBootstrap = false;
         targetP->shortID = 123;
         targetP->clientHoldOffTime = 10;
+        targetP->security_mode = (uint32_t)security_mode_psk;
 
         securityObj->instanceList = LWM2M_LIST_ADD(securityObj->instanceList, targetP);
 
         securityObj->readFunc = prv_security_read;
+#ifdef LWM2M_BOOTSTRAP
+        securityObj->writeFunc = prv_security_write;
+        securityObj->createFunc = prv_security_create;
+        securityObj->deleteFunc = prv_security_delete;
+#endif
+
     }
 
     return securityObj;
@@ -264,3 +352,32 @@ char * get_server_uri(lwm2m_object_t * objectP,
 
     return NULL;
 }
+
+unsigned char * get_connection_psk(lwm2m_object_t * objectP, uint16_t secObjInstID, size_t * psk_len)
+{
+	uint8_t * psk;
+    security_instance_t * targetP = (security_instance_t *)LWM2M_LIST_FIND(objectP->instanceList, secObjInstID);
+
+    if (NULL != targetP)
+    {
+        psk = (unsigned char*)targetP->secret_key;
+        *psk_len = targetP->secret_key_len;
+    }
+
+	return psk;
+}
+
+unsigned char * get_public_identiy(lwm2m_object_t * objectP, uint16_t secObjInstID, size_t * public_identity_len)
+{
+	uint8_t * psk;
+    security_instance_t * targetP = (security_instance_t *)LWM2M_LIST_FIND(objectP->instanceList, secObjInstID);
+
+    if (NULL != targetP)
+    {
+        psk = (unsigned char*)targetP->public_identity;
+        *public_identity_len = targetP->public_identity_len;
+    }
+
+	return psk;
+}
+

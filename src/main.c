@@ -76,10 +76,8 @@
 #include "ff.h"
 #include "diskio.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
-
 #include "simplelink.h"
+#include "mbedtls/ssl.h"
 
 int main(int argc, char *argv[])
 {
@@ -150,8 +148,12 @@ int main(int argc, char *argv[])
 
 	DMADRV_Init();
 
+	/* Initialize SPI peripherals */
 	BOARD_SD_Card_Init();
 	Board_CC3100_Init();
+
+	board_i2c_init();
+
 
 	SysTick_Config(SystemCoreClock / TIMER_FREQUENCY_HZ);
 
@@ -160,7 +162,6 @@ int main(int argc, char *argv[])
 
 	sl_sleeptimer_date_t date;
 
-	//sl_sleeptimer_set_time(1668160431); // Default Unix Timestamp
 	(void)sl_sleeptimer_build_datetime(
 			&date,
 			(2022 - 1900), /* DEFAULT YEAR */
@@ -179,6 +180,8 @@ int main(int argc, char *argv[])
 	create_user_task();
 
 	create_wifi_service_task();
+
+	create_sensor_task();
 
 	VStartSimpleLinkSpawnTask(uiso_task_connectivity_service);
 
@@ -223,10 +226,26 @@ SysTick_Handler(void)
 	}
 }
 
-/* Implementing gettimeofday */
-int _gettimeofday(struct timeval* ptimeval, void* ptimezone)
+#include <sys/time.h>
+extern int _gettimeofday(struct timeval* ptimeval, void * ptimezone);
+/* implementing system time */
+int _gettimeofday(struct timeval* ptimeval, void * ptimezone)
 {
-	// TODO
+	struct timezone * timezone_ptr = (struct timezone * )ptimezone;
+
+	if(NULL != ptimeval)
+	{
+		ptimeval->tv_sec = sl_sleeptimer_get_time();
+		ptimeval->tv_usec = 0;
+	}
+
+	if(NULL != timezone_ptr)
+	{
+		timezone_ptr->tz_dsttime = 0;
+		timezone_ptr->tz_minuteswest = 0;
+	}
+
+	return 0;
 }
 
 #pragma GCC diagnostic pop

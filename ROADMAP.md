@@ -1,6 +1,5 @@
 # Implemented
-
-# Integration of
+- FreeRTOS Runtime
 - LEDs (Red, Orange, Yellow)
 - Buttons 1 and 2 plus interrupts
 - RTC and sleeptimer
@@ -8,19 +7,22 @@
 - SPI driver for Simplelink and SD Card
 - SD Card driver
 - FatFS adaption (including RTC driver)
-
-# Doing
 - Wifi Service
 - NTP service
+- Wakaama integration
+
+
+
+
+# Doing
+- MBedTLS
+- Sensors
+- I2C master driver
+
 
 
 #Todo
-- Wakaama
-- Sensors
-- I2C master driver
-- TEMPDRV
 - UARTDrv
 - NVM
-- MBedTLS
-
+- paho
 

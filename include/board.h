@@ -33,7 +33,7 @@
 
 #define BOARD_LED_RED_PIN       (12)
 #define BOARD_LED_RED_PORT      (gpioPortA)
-#define BOARD_LED_RED_MODE   (gpioModePushPull)
+#define BOARD_LED_RED_MODE      (gpioModePushPull)
 #define BOARD_LED_RED_INIT      (0)
 
 #define BOARD_LED_YELLOW_PIN    (0)
@@ -137,6 +137,96 @@
 #define WIFI_SPI0_SCK_PIN                                                       (12)
 #define WIFI_SPI0_SCK_PORT                                                      (gpioPortE)
 #define WIFI_SPI0_SCK_MODE                                                      (gpioModePushPull)
+
+
+/* Sensors */
+#define VDD_BMA280_PIN                                                          (7)
+#define VDD_BMA280_PORT                                                         (gpioPortE)
+#define VDD_BMA280_MODE                                                         (gpioModePushPull)
+
+#define VDD_BME280_PIN                                                          (8)
+#define VDD_BME280_PORT                                                         (gpioPortE)
+#define VDD_BME280_MODE                                                         (gpioModePushPullDrive)
+
+#define VDD_BMG160_PIN                                                          (13)
+#define VDD_BMG160_PORT                                                         (gpioPortD)
+#define VDD_BMG160_MODE                                                         (gpioModePushPullDrive)
+
+#define VDD_BMI160_PIN                                                          (3)
+#define VDD_BMI160_PORT                                                         (gpioPortE)
+#define VDD_BMI160_MODE                                                         (gpioModePushPullDrive)
+
+#define VDD_BMM150_PIN                                                          (5)
+#define VDD_BMM150_PORT                                                         (gpioPortE)
+#define VDD_BMM150_MODE                                                         (gpioModePushPull)
+
+#define VDD_MAX44009_PIN                                                        (6)
+#define VDD_MAX44009_PORT                                                       (gpioPortE)
+#define VDD_MAX44009_MODE                                                       (gpioModePushPullDrive)
+
+#define BMA280_INT1_PIN                                                         (8)
+#define BMA280_INT1_PORT                                                        (gpioPortF)
+#define BMA280_INT1_MODE                                                        (gpioModeInputPullFilter)
+#define BMA280_INT1_EDGE_RISING                                                 false
+#define BMA280_INT1_EDGE_FALLING                                                true
+
+#define BMA280_INT2_PIN                                                         (9)
+#define BMA280_INT2_PORT                                                        (gpioPortF)
+#define BMA280_INT2_MODE                                                        (gpioModeInputPullFilter)
+#define BMA280_INT2_EDGE_RISING                                                 false
+#define BMA280_INT2_EDGE_FALLING                                                true
+
+#define BMG160_INT1_PIN                                                         (6)
+#define BMG160_INT1_PORT                                                        (gpioPortC)
+#define BMG160_INT1_MODE                                                        (gpioModeInputPullFilter)
+#define BMG160_INT1_EDGE_RISING                                                 false
+#define BMG160_INT1_EDGE_FALLING                                                true
+
+#define BMG160_INT2_PIN                                                         (7)
+#define BMG160_INT2_PORT                                                        (gpioPortA)
+#define BMG160_INT2_MODE                                                        (gpioModeInputPullFilter)
+#define BMG160_INT2_EDGE_RISING                                                 false
+#define BMG160_INT2_EDGE_FALLING                                                true
+
+#define BMI160_INT1_PIN                                                         (13)
+#define BMI160_INT1_PORT                                                        (gpioPortA)
+#define BMI160_INT1_MODE                                                        (gpioModeInputPullFilter)
+#define BMI160_INT1_EDGE_RISING                                                 false
+#define BMI160_INT1_EDGE_FALLING                                                true
+
+#define BMI160_INT2_PIN                                                         (14)
+#define BMI160_INT2_PORT                                                        (gpioPortA)
+#define BMI160_INT2_MODE                                                        (gpioModeInputPullFilter)
+#define BMI160_INT2_EDGE_RISING                                                 false
+#define BMI160_INT2_EDGE_FALLING                                                true
+
+#define BMM150_DRDY_PIN                                                         (15)
+#define BMM150_DRDY_PORT                                                        (gpioPortE)
+#define BMM150_DRDY_MODE                                                        (gpioModeInputPullFilter)
+#define BMM150_DRDY_EDGE_RISING                                                 true
+#define BMM150_DRDY_EDGE_FALLING                                                false
+
+#define BMM150_INT_PIN                                                          (12)
+#define BMM150_INT_PORT                                                         (gpioPortD)
+#define BMM150_INT_MODE                                                         (gpioModeInputPullFilter)
+#define BMM150_INT_EDGE_RISING                                                  false
+#define BMM150_INT_EDGE_FALLING                                                 true
+
+#define MAX44009_INTN_PIN                                                       (4)
+#define MAX44009_INTN_PORT                                                      (gpioPortE)
+#define MAX44009_INTN_MODE                                                      (gpioModeInputPullFilter)
+#define MAX44009_INTN_EDGE_RISING                                               false
+#define MAX44009_INTN_EDGE_FALLING                                              true
+
+
+
+
+
+
+
+
+
+
 
 enum Board_LED_State
 {

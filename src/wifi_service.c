@@ -12,7 +12,7 @@
 #include "simplelink.h"
 #include "uiso_ntp.h"
 
-#define WIFI_TASK_PRIORITY    (UBaseType_t)( uiso_task_runtime_services )
+#define WIFI_TASK_PRIORITY    (UBaseType_t)( uiso_rtos_prio_above_normal )
 
 extern int lwm2m_client_task_runner(void * param1);
 

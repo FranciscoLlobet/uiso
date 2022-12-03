@@ -21,10 +21,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "simplelink.h"
-// #include <netinet/in.h>
-// #include <arpa/inet.h>
-// #include <netdb.h>
-// #include <sys/socket.h>
 #include <sys/stat.h>
 #include <liblwm2m.h>
 
@@ -35,22 +31,17 @@
 #define LWM2M_BSSERVER_PORT_STR "5685"
 #define LWM2M_BSSERVER_PORT      5685
 
-typedef struct _connection_t
-{
-    struct _connection_t *  next;
-    int                     sock;
-    SlSockAddrIn_t          addr;
-    size_t                  addrLen;
-} connection_t;
+
+typedef struct uiso_mbedtls_context_s * connection_t;
 
 int create_socket(const char * portStr, int ai_family);
 
-connection_t * connection_find(connection_t * connList, struct sockaddr_in * addr, size_t addrLen);
-connection_t * connection_new_incoming(connection_t * connList, int sock, struct sockaddr * addr, size_t addrLen);
-connection_t * connection_create(connection_t * connList, int sock, char * host, char * port, int addressFamily);
+connection_t connection_find(connection_t connList, struct sockaddr_in * addr, size_t addrLen);
+connection_t connection_new_incoming(connection_t connList, struct uiso_mbedtls_context_s * connection);
+connection_t connection_create(connection_t connList, int sock, char * host, char * port, int protocol);
 
-void connection_free(connection_t * connList);
+void connection_free(connection_t connList);
 
-int connection_send(connection_t *connP, uint8_t * buffer, size_t length);
+int connection_send(connection_t connP, uint8_t * buffer, size_t length);
 
 #endif

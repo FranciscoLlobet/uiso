@@ -52,24 +52,6 @@
 
 */
 
-/*
- * Implements an object for testing purpose
- *
- *                  Multiple
- * Object |  ID   | Instances | Mandatory |
- *  Test  | 31024 |    Yes    |    No     |
- *
- *  Resources:
- *              Supported    Multiple
- *  Name | ID | Operations | Instances | Mandatory |  Type   | Range | Units |      Description      |
- *  test |  1 |    R/W     |    No     |    Yes    | Integer | 0-255 |       |                       |
- *  exec |  2 |     E      |    No     |    Yes    |         |       |       |                       |
- *  dec  |  3 |    R/W     |    No     |    Yes    |  Float  |       |       |                       |
- *  sig  |  4 |    R/W     |    No     |    Yes    | Integer |       |       | 16-bit signed integer |
- *
- */
-
-
 #include "liblwm2m.h"
 
 #include <stdio.h>
@@ -173,9 +155,22 @@ static uint8_t prv_read(lwm2m_context_t * contextP,
 
     if(*numDataP == 0)
     {
-    	// Full object
-    	//(*dataArrayP)[i].id = res
-    	return COAP_404_NOT_FOUND;
+    	*numDataP = 7;
+
+    	*dataArrayP = lwm2m_data_new(6);
+    	if(NULL == *dataArrayP)
+    	{
+    		return COAP_500_INTERNAL_SERVER_ERROR;
+    	}
+
+    	/* Populate data array */
+    	(*dataArrayP)[0].id = RESOURCE_ID_SENSOR_VALUE;
+    	(*dataArrayP)[1].id = RESOURCE_ID_MIN_MEASURED_VALUE;
+    	(*dataArrayP)[2].id = RESOURCE_ID_MAX_MEASURED_VALUE;
+    	(*dataArrayP)[3].id = RESOURCE_ID_MIN_RANGE_VALUE;
+    	(*dataArrayP)[4].id = RESOURCE_ID_MAX_RANGE_VALUE;
+    	(*dataArrayP)[5].id = RESOURCE_ID_TIMESTAMP;
+    	(*dataArrayP)[6].id = RESOURCE_ID_SENSOR_UNITS;
     }
 
     for(int i = 0; i< *numDataP; i++)
@@ -202,17 +197,13 @@ static uint8_t prv_read(lwm2m_context_t * contextP,
     		lwm2m_data_encode_float(20.0f, *dataArrayP + i);
     		rVal = COAP_205_CONTENT;
     		break;
-    	case RESOURCE_ID_SENSOR_UNITS:
-    		lwm2m_data_encode_string("C", *dataArrayP + 1);
-    		rVal = COAP_205_CONTENT;
-        	break;
-    	case RESOURCE_ID_APPLICATION_TYPE:
-    		rVal = COAP_205_CONTENT;
-    		lwm2m_data_encode_string("Microcontroller Sensor", *dataArrayP + 1);
-    		break;
     	case RESOURCE_ID_TIMESTAMP:
+    		lwm2m_data_encode_int(lwm2m_gettime(), *dataArrayP + i);
     		rVal = COAP_205_CONTENT;
-    		lwm2m_data_encode_int(lwm2m_gettime(), *dataArrayP + 1);
+    		break;
+    	case RESOURCE_ID_SENSOR_UNITS:
+    		lwm2m_data_encode_string("Celsius", *dataArrayP + i);
+    		rVal = COAP_205_CONTENT;
     		break;
     	default:
     		return COAP_404_NOT_FOUND;
@@ -237,7 +228,10 @@ static uint8_t prv_discover(lwm2m_context_t * contextP,
     if (*numDataP == 0)
     {
         *dataArrayP = lwm2m_data_new(4);
-        if (*dataArrayP == NULL) return COAP_500_INTERNAL_SERVER_ERROR;
+        if (*dataArrayP == NULL)
+        {
+        	return COAP_500_INTERNAL_SERVER_ERROR;
+        }
         *numDataP = 4;
         (*dataArrayP)[0].id = 1;
         (*dataArrayP)[1].id = 2;
@@ -368,7 +362,8 @@ static uint8_t prv_create(lwm2m_context_t * contextP,
 
     targetP->shortID = instanceId;
     objectP->instanceList = LWM2M_LIST_ADD(objectP->instanceList, targetP);
-
+    objectP->versionMajor = 1;
+    objectP->versionMinor = 1;
     result = prv_write(contextP, instanceId, numData, dataArray, objectP, LWM2M_WRITE_REPLACE_RESOURCES);
 
     if (result != COAP_204_CHANGED)

@@ -20,5 +20,34 @@ devices:
 
 wifi:
     
-  
-  
+    
+Object: Time
+  id: 3333
+  Resources
+    - 
+      Resource: Current Time
+      id: 5506
+
+
+Object: Accelerometer
+Resources: 
+  - 
+    Resource: "X Value"
+    id: 5702
+    type: Float
+  - 
+    Resource: "Y Value"
+    id: 5703
+    type: Float
+  - 
+    Resource: "Z Value"
+    id: 5704
+    type: Float
+  - 
+    Resource: "Application Type"
+    id: 5750
+    type: String
+  - 
+    Resource: Timestamp
+    type: Time
+id: 3313

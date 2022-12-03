@@ -181,7 +181,10 @@ static uint8_t prv_device_read(lwm2m_context_t * contextP,
         int nbRes = sizeof(resList)/sizeof(uint16_t);
 
         *dataArrayP = lwm2m_data_new(nbRes);
-        if (*dataArrayP == NULL) return COAP_500_INTERNAL_SERVER_ERROR;
+        if (*dataArrayP == NULL)
+        {
+        	return COAP_500_INTERNAL_SERVER_ERROR;
+        }
         *numDataP = nbRes;
         for (i = 0 ; i < nbRes ; i++)
         {
@@ -243,7 +246,10 @@ static uint8_t prv_device_discover(lwm2m_context_t * contextP,
         int nbRes = sizeof(resList)/sizeof(uint16_t);
 
         *dataArrayP = lwm2m_data_new(nbRes);
-        if (*dataArrayP == NULL) return COAP_500_INTERNAL_SERVER_ERROR;
+        if (*dataArrayP == NULL)
+        {
+        	return COAP_500_INTERNAL_SERVER_ERROR;
+        }
         *numDataP = nbRes;
         for (i = 0 ; i < nbRes ; i++)
         {
@@ -321,6 +327,8 @@ lwm2m_object_t * get_object_device()
          * The 3 is the standard ID for the mandatory object "Object device".
          */
         deviceObj->objID = LWM2M_DEVICE_OBJECT_ID;
+        deviceObj->versionMajor = 1;
+        deviceObj->versionMinor = 1;
 
         /*
          * and its unique instance
