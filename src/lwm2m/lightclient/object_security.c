@@ -87,10 +87,14 @@ enum {
 	matching_type_exact_sha512 = 3,
 };
 
+#if 0
 const char default_server_uri[] = "coaps://192.168.16.103:5684";
+#else
+const char default_server_uri[] = "coaps://leshan.eclipseprojects.io:5684";
+#endif
 const char default_psk_id[] = "8af526a6-6766-11ed-9022-0242ac120002";
 const uint8_t default_psk[] = "cCn4e/HZ3qDE/OZHCww0bA==";
-
+//7029f87bf1d9dea0c4fce6470b0c346c
 typedef struct _security_instance_
 {
     struct _security_instance_ * next;        // matches lwm2m_list_t::next

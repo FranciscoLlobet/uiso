@@ -23,197 +23,281 @@
 #include "commandline.h"
 #include "uiso_net_sockets.h"
 #include "mbedtls/net_sockets.h"
-//#include "simplelink.h"
 #include <sys/types.h>
+
+#define SIMPLE_LINK_MAX_SEND_MTU 	1472
 
 extern mbedtls_ssl_context ssl_context;
 extern uiso_mbedtls_context_t net_context;
 
-int create_socket(const char * portStr, int addressFamily)
+connection_t connection_find(connection_t connList, struct sockaddr_in *addr,
+		size_t addrLen)
 {
-	(int)addressFamily;
-	int s = -1;
-	int res = -1;
+	connection_t connP;
 
-	SlSockAddrIn_t local_socket = { .sin_family = SL_AF_INET, .sin_port = 0, .sin_addr = { .s_addr = 0 } };
-
-	local_socket.sin_addr.s_addr = 0;
-	if(NULL != portStr){
-		local_socket.sin_port = __REV16(atoi(portStr));
-	}
-	else
+	connP = connList;
+	while (connP != NULL)
 	{
-		local_socket.sin_port = 0;
-	}
-
-	s = sl_Socket(SL_AF_INET, SL_SOCK_DGRAM, IPPROTO_UDP);
-	if(s >= 0)
-	{
-		res = sl_Bind(s, (SlSockAddr_t*) &local_socket, sizeof(local_socket));
-		if(res < 0)
+		/* Modified this for IPv4 */
+		if (uiso_net_compare_addresses_ipv4((SlSockAddrIn_t*) addr,
+				&(connP->host_addr)))
 		{
-			(void)sl_Close(s);
-			s = -1;
+			return connP;
 		}
+
+		connP = connP->next;
 	}
 
-    return s;
+	return connP;
 }
 
-connection_t connection_find(connection_t connList,
-                               struct sockaddr_in * addr,
-                               size_t addrLen)
+connection_t connection_new_incoming(connection_t connList,
+		struct uiso_mbedtls_context_s *connection)
 {
-    connection_t connP;
+	connection_t connP;
 
-    connP = connList;
-    while (connP != NULL)
-    {
-    	/* Modified this for IPv4 */
-    	if(uiso_net_compare_addresses_ipv4( (SlSockAddrIn_t *)addr, &(connP->host_addr)))
-    	{
-    		return connP;
-    	}
+	connP = (connection_t) lwm2m_malloc(sizeof(connection_t));
+	if (connP != NULL)
+	{
+		/* Prepend to list */
+		memmove(connP, connection, sizeof(struct uiso_mbedtls_context_s));
+		connP->next = connList;
+	}
 
-        connP = connP->next;
-    }
-
-    return connP;
+	return connP;
 }
 
-connection_t connection_new_incoming(connection_t connList, struct uiso_mbedtls_context_s * connection)
+connection_t connection_create(connection_t connList, char *host, char *port,
+		int protocol)
 {
-    connection_t connP;
-
-    connP = (connection_t)lwm2m_malloc(sizeof(connection_t));
-    if (connP != NULL)
-    {
-    	/* Prepend to list */
-        memmove(connP, connection, sizeof(struct uiso_mbedtls_context_s));
-        connP->next = connList;
-    }
-
-    return connP;
-}
-
-
-
-connection_t connection_create(connection_t connList,
-                                 int sock,
-                                 char * host,
-                                 char * port,
-                                 int protocol)
-{
-	(void)sock;
+	(void) connList;
 	int ret = UISO_NET_GENERIC_ERROR;
-
 
 	connection_t connP = NULL;
 
-    ret = uiso_mbedtls_net_connect(&net_context, host, port, protocol);
+	ret = uiso_mbedtls_net_connect(&net_context, host, port, protocol);
 
-	if(UISO_NET_OK == ret)
+	if (UISO_NET_OK == ret)
 	{
-		if(uiso_protocol_dtls_ip4 == protocol)
+		if (uiso_protocol_dtls_ip4 == protocol)
 		{
-			mbedtls_ssl_set_bio( net_context.ssl_context, &net_context, mbedtls_net_send, mbedtls_net_recv, mbedtls_net_recv_timeout );
-			mbedtls_ssl_set_mtu( net_context.ssl_context, 1460);
+			mbedtls_ssl_set_bio(net_context.ssl_context, &net_context,
+					mbedtls_net_send, mbedtls_net_recv, NULL);
+			mbedtls_ssl_set_mtu(net_context.ssl_context,
+					SIMPLE_LINK_MAX_SEND_MTU); /* Set MTU to match simple-link */
 
-			do {
-				ret = mbedtls_ssl_handshake( net_context.ssl_context );
-			}while( (ret == MBEDTLS_ERR_SSL_WANT_READ) || (ret == MBEDTLS_ERR_SSL_WANT_WRITE) );
+			do
+			{
+				ret = mbedtls_ssl_handshake(net_context.ssl_context);
+			} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+					|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
 		}
 	}
 
-	if(UISO_NET_OK == ret)
+	if (UISO_NET_OK == ret)
 	{
 		//connP = connection_new_incoming(connList, &net_context);
 		net_context.next = NULL;
 		connP = &net_context;
+		net_context.last_send_time = lwm2m_gettime();
 	}
 
-
-    return connP;
+	return connP;
 }
-
-
-
 
 void connection_free(connection_t connList)
 {
-    while (connList != NULL)
-    {
-        connection_t nextP;
+	int ret = UISO_NET_GENERIC_ERROR;
 
-        nextP = connList->next;
-        lwm2m_free(connList);
+	do
+	{
+		ret = mbedtls_ssl_close_notify(net_context.ssl_context);
+	} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+			|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
 
-        connList = nextP;
-    }
+	mbedtls_net_close(&net_context);
 }
 
-
-int connection_send(connection_t connP,
-                    uint8_t * buffer,
-                    size_t length)
+int connection_send(connection_t connP, uint8_t *buffer, size_t length)
 {
-    int nbSent;
-    size_t offset;
+	int nbSent;
+	size_t offset;
 
-    offset = 0;
-    while (offset != length)
-    {
-    	if(connP->protocol == uiso_protocol_dtls_ip4)
-    	{
-    		nbSent = mbedtls_ssl_write(&ssl_context, buffer + offset, length - offset);
-    	}
-    	else if(connP->protocol == uiso_protocol_udp_ip4)
-    	{
-    		nbSent = sendto(connP->fd, buffer + offset, length - offset, 0, (struct sockaddr *)&(connP->host_addr), connP->host_addr_len);
-    	}
-    	else
-    	{
-    		/* Unsupported protocol */
-    		nbSent = -1;
-    	}
+	offset = 0;
+	time_t current_time = lwm2m_gettime();
 
-        if (nbSent < 0) return -1;
-        offset += nbSent;
-    }
-    return 0;
+	/* Re-negotiation after a certain timeout */
+	if (connP->protocol == uiso_protocol_dtls_ip4)
+	{
+		int ret = -1;
+		int enabled = MBEDTLS_SSL_CID_DISABLED;
+
+		/* Check if CID is available from peer */
+		ret = mbedtls_ssl_get_peer_cid(&ssl_context, &enabled, NULL, 0);
+		if (MBEDTLS_SSL_CID_DISABLED == enabled)
+		{
+			if ((current_time - connP->last_send_time) > 120)
+			{
+				/* Attempt re-negotiation */
+				do
+				{
+					ret = mbedtls_ssl_renegotiate(&ssl_context);
+				} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+						|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret)
+						|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == ret));
+
+				if (0 != ret)
+				{
+					/* This code tries to handle issues seen when the server does not support renegociation */
+					ret = mbedtls_ssl_close_notify(&ssl_context);
+					if (0 == ret)
+					{
+						ret = mbedtls_ssl_session_reset(&ssl_context);
+					}
+					else
+					{
+						(void) mbedtls_ssl_session_reset(&ssl_context);
+					}
+
+					if (0 == ret)
+					{
+						do
+						{
+							ret = mbedtls_ssl_handshake(
+									net_context.ssl_context);
+						} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+								|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+					}
+				}
+
+				if (0 != ret)
+				{
+					printf("Error: %d", ret);
+					return -1;
+				}
+			}
+		}
+	}
+
+	while (offset != length)
+	{
+		if (connP->protocol == uiso_protocol_dtls_ip4)
+		{
+			nbSent = mbedtls_ssl_write(&ssl_context, buffer + offset,
+					length - offset);
+			if ((MBEDTLS_ERR_SSL_WANT_READ == nbSent)
+					|| (MBEDTLS_ERR_SSL_WANT_WRITE == nbSent)
+					|| (MBEDTLS_ERR_SSL_ASYNC_IN_PROGRESS == nbSent)
+					|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == nbSent))
+			{
+				nbSent = 0;
+			}
+			else if (0 > nbSent)
+			{
+#if 0
+				int ret = -1;
+				do
+				{
+					ret = mbedtls_ssl_close_notify(&ssl_context);
+				} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+						|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+
+				ret = mbedtls_ssl_session_reset(&ssl_context);
+				if (0 == ret)
+				{
+					do
+					{
+						ret = mbedtls_ssl_handshake(net_context.ssl_context);
+					} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+							|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+				}
+				if (0 == ret)
+				{
+					nbSent = 0;
+				}
+#endif
+			}
+		}
+		else if (connP->protocol == uiso_protocol_udp_ip4)
+		{
+			nbSent = sendto(connP->fd, buffer + offset, length - offset, 0,
+					(struct sockaddr*) &(connP->host_addr),
+					connP->host_addr_len);
+		}
+		else
+		{
+			nbSent = -1; /* Unsupported protocol */
+		}
+
+		if (nbSent < 0)
+			return -1;
+		offset += nbSent;
+	}
+
+	connP->last_send_time = current_time;
+	return 0;
 }
 
-
-
-uint8_t lwm2m_buffer_send(void * sessionH,
-                          uint8_t * buffer,
-                          size_t length,
-                          void * userdata)
+int connection_renegociate(connection_t connP)
 {
-    connection_t connP = (connection_t) sessionH;
+	int ret = -1;
 
-    (void)userdata; /* unused */
+	/* Attempt re-negotiation */
+	do
+	{
+		ret = mbedtls_ssl_renegotiate(&ssl_context);
+	} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+			|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret)
+			|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == ret));
 
-    if (connP == NULL)
-    {
-        fprintf(stderr, "#> failed sending %lu bytes, missing connection\r\n", length);
-        return COAP_500_INTERNAL_SERVER_ERROR ;
-    }
+	if (0 != ret)
+	{
+		/* This code tries to handle issues seen when the server does not support renegociation */
+		do
+		{
+			ret = mbedtls_ssl_close_notify(&ssl_context);
+		} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+				|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
 
-    if (-1 == connection_send(connP, buffer, length))
-    {
-        fprintf(stderr, "#> failed sending %lu bytes\r\n", length);
-        return COAP_500_INTERNAL_SERVER_ERROR ;
-    }
+		ret = mbedtls_ssl_session_reset(&ssl_context);
 
-    return COAP_NO_ERROR;
+		if (0 == ret)
+		{
+			do
+			{
+				ret = mbedtls_ssl_handshake(net_context.ssl_context);
+			} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
+					|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+		}
+
+	}
+
+	return ret;
 }
 
-bool lwm2m_session_is_equal(void * session1,
-                            void * session2,
-                            void * userData)
+uint8_t lwm2m_buffer_send(void *sessionH, uint8_t *buffer, size_t length,
+		void *userdata)
 {
-    (void)userData; /* unused */
+	connection_t connP = (connection_t) sessionH;
 
-    return true; //(session1 == session2);
+	(void) userdata; /* unused */
+
+	if (connP == NULL)
+	{
+		return COAP_500_INTERNAL_SERVER_ERROR ;
+	}
+
+	if (-1 == connection_send(connP, buffer, length))
+	{
+		return COAP_500_INTERNAL_SERVER_ERROR ;
+	}
+
+	return COAP_NO_ERROR ;
+}
+
+bool lwm2m_session_is_equal(void *session1, void *session2, void *userData)
+{
+	(void) userData; /* unused */
+
+	return true; //(session1 == session2);
 }

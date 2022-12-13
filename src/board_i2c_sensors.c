@@ -39,9 +39,9 @@ I2CSPM_Init_TypeDef init_i2c1 = {
 struct
 {
 	SemaphoreHandle_t i2c0_semaphore;
-	SemaphoreHandle_t i2c1_semaphore;
+	SemaphoreHandle_t i2c0_mutex;
 } board_i2c_os_control =
-{ .i2c0_semaphore = NULL, .i2c1_semaphore = NULL };
+{ .i2c0_semaphore = NULL, .i2c0_mutex = NULL };
 
 void board_i2c_init(void)
 {
@@ -79,6 +79,11 @@ void board_i2c_init(void)
 		board_i2c_os_control.i2c0_semaphore = xQueueCreate(1,
 				sizeof(I2C_TransferReturn_TypeDef));
 	}
+	if( board_i2c_os_control.i2c0_mutex == NULL)
+	{
+		board_i2c_os_control.i2c0_mutex = xSemaphoreCreateMutex();
+		(void)xSemaphoreGive( board_i2c_os_control.i2c0_mutex);
+	}
 
 	I2CSPM_Init(&init_i2c0);
 }
@@ -86,6 +91,11 @@ void board_i2c_init(void)
 I2C_TransferReturn_TypeDef board_i2c0_transfer(I2C_TransferSeq_TypeDef *seq)
 {
 	I2C_TransferReturn_TypeDef ret = i2cTransferSwFault;
+
+	if(pdFALSE == xSemaphoreTake( board_i2c_os_control.i2c0_mutex, 1000))
+	{
+		return i2cTransferSwFault;
+	}
 
 	NVIC_EnableIRQ(I2C0_IRQn);
 
@@ -107,6 +117,8 @@ I2C_TransferReturn_TypeDef board_i2c0_transfer(I2C_TransferSeq_TypeDef *seq)
 
 	NVIC_ClearPendingIRQ(I2C0_IRQn);
 	NVIC_DisableIRQ(I2C0_IRQn);
+
+	(void)xSemaphoreGive( board_i2c_os_control.i2c0_mutex);
 
 	return ret;
 }

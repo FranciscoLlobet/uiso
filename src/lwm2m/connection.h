@@ -38,7 +38,10 @@ int create_socket(const char * portStr, int ai_family);
 
 connection_t connection_find(connection_t connList, struct sockaddr_in * addr, size_t addrLen);
 connection_t connection_new_incoming(connection_t connList, struct uiso_mbedtls_context_s * connection);
-connection_t connection_create(connection_t connList, int sock, char * host, char * port, int protocol);
+
+connection_t connection_create(connection_t connList, char * host, char * port, int protocol);
+
+
 
 void connection_free(connection_t connList);
 

@@ -67,8 +67,8 @@
 #include <ctype.h>
 
 
-#define PRV_MANUFACTURER      "llobetian Tecnologica"
-#define PRV_MODEL_NUMBER      "Wakaama XDK"
+#define PRV_MANUFACTURER      "Llobetian Tecnologica"
+#define PRV_MODEL_NUMBER      "XDK100 FreeRTOS+Wakaama+mbedTLS"
 #define PRV_BINDING_MODE      "U"
 
 // Resource Id's:
@@ -110,19 +110,19 @@ static uint8_t prv_set_value(lwm2m_data_t * dataP)
         return COAP_205_CONTENT;
 
     case RES_O_SERIAL_NUMBER:
-		lwm2m_data_encode_string("SER 0.0.0.0", dataP);
+		lwm2m_data_encode_string("15-01021", dataP);
     	return COAP_205_CONTENT;
 
     case RES_O_FIRMWARE_VERSION:
-    	lwm2m_data_encode_string("FW v0.0.0", dataP);
+    	lwm2m_data_encode_string("v0.0.0", dataP);
     	return COAP_205_CONTENT;
 
     case RES_O_HARDWARE_VERSION:
-		lwm2m_data_encode_string("HW v0.0.0", dataP);
+		lwm2m_data_encode_string("Bosch XDK110", dataP);
 		return COAP_205_CONTENT;
 
     case RES_O_SOFTWARE_VERSION:
-		lwm2m_data_encode_string("SW v0.0.0", dataP);
+		lwm2m_data_encode_string("v0.0.0", dataP);
 		return COAP_205_CONTENT;
 
     case RES_O_BATTERY_LEVEL:

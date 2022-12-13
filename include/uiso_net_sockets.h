@@ -54,6 +54,7 @@ typedef struct uiso_mbedtls_context_s
 {
     struct uiso_mbedtls_context_s * next;
     int fd; /* Socket Descriptor */
+
     int32_t protocol; /* Protocol to use */
     SlSockAddrIn_t host_addr; /* Host Address */
     size_t host_addr_len;
@@ -65,6 +66,9 @@ typedef struct uiso_mbedtls_context_s
     void * app_param_p; /* Pointer App parameter */
     uint32_t app_param_u; /* App param */
     uint32_t bogo_param;
+
+    time_t last_send_time;
+    time_t last_read_time;
 }
 uiso_mbedtls_context_t;
 
@@ -82,8 +86,9 @@ bool uiso_net_compare_addresses_ipv4(SlSockAddrIn_t * address_1, SlSockAddrIn_t 
 /* Initialize the net context */
 void uiso_mbedtls_net_init( uiso_mbedtls_context_t *ctx );
 
+
 /**
- * Connects to a socket. Does not proceed with the handshake (!)
+ * Connects to a socket.
  */
 int uiso_mbedtls_net_connect(uiso_mbedtls_context_t *ctx, const char *host, const char *port, int proto );
 

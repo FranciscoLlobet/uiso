@@ -47,7 +47,7 @@ void user_task(void *param)
     volatile int ret = 0;
 	uint32_t ulNotifiedValue = 0;
 
-
+#if 0
 
 	/* BMI 150 code */
 	board_bmm150_enable();
@@ -90,31 +90,15 @@ void user_task(void *param)
 			ret =  bmm150_set_presetmode(&settings, &board_bmm150);
 		}
 	}
+#endif
 
 
 
+	vTaskSuspend(NULL);
 
-//	vTaskSuspend(NULL);
-
-
-
-	do{
+	lwm2m_client_task_runner(NULL);
 
 
-
-		ret = bmm150_read_mag_data(&bmm150_sensor_data, &board_bmm150);
-
-
-
-
-		// lwm2m_client_task_runner(NULL);
-
-
-	    vTaskDelay(1000);
-
-
-
-	}while(1);
 
 }
 

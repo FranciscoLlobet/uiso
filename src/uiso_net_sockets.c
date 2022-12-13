@@ -50,7 +50,7 @@
 
 
 #define UISO_NET_FALSE	((uint32_t)0)
-#define UISO_NET TRUE	((uint32_t)!UISO_NET_FALSE)
+#define UISO_NET_TRUE	((uint32_t)!UISO_NET_FALSE)
 
 bool uiso_net_compare_addresses_ipv4(SlSockAddrIn_t *address_1,
 		SlSockAddrIn_t *address_2)
@@ -161,6 +161,7 @@ int uiso_mbedtls_net_connect(uiso_mbedtls_context_t *ctx, const char *host,
 		}
 	}
 
+
 	return ret;
 }
 
@@ -172,7 +173,7 @@ int uiso_mbedtls_net_connect(uiso_mbedtls_context_t *ctx, const char *host,
 
 
 
-
+#if 0
 /**
  * \brief          Callback type: send data on the network.
  *
@@ -322,6 +323,7 @@ int mbedtls_ssl_recv_timeout(void *ctx, unsigned char *buf, size_t len,
 
 	return (uiso_mbedtls_ssl_recv(ctx, buf, len));
 }
+#endif
 
 /*
  * Prepare for using the sockets interface
@@ -359,9 +361,7 @@ void mbedtls_net_init(mbedtls_net_context *ctx)
 	ctx->fd = -1;
 }
 
-/*
- * Initiate a TCP connection with host:port and the given protocol
- */
+#if 0
 int mbedtls_net_connect(mbedtls_net_context *ctx, const char *host,
 		const char *port, int proto)
 {
@@ -409,6 +409,7 @@ int mbedtls_net_connect(mbedtls_net_context *ctx, const char *host,
 	ctx->fd = -1;
 	return MBEDTLS_ERR_NET_CONNECT_FAILED;
 }
+#endif
 
 /*
  * Create a listening socket on bind_ip:port
@@ -686,7 +687,7 @@ int mbedtls_net_recv(void *ctx, unsigned char *buf, size_t len)
 {
 	int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 	int fd = ((uiso_mbedtls_context_t*) ctx)->fd;
-	SlSockAddrIn_t host_addr = ((uiso_mbedtls_context_t*) ctx)->host_addr;
+	SlSockAddrIn_t * host_addr = &((uiso_mbedtls_context_t*) ctx)->host_addr;
 
 	ret = check_fd(fd, 0);
 	if (ret != 0)
@@ -697,8 +698,8 @@ int mbedtls_net_recv(void *ctx, unsigned char *buf, size_t len)
 		len = 16000;
 	}
 
-	SlSocklen_t from_len = sizeof(host_addr);
-	ret = (int) sl_RecvFrom(fd, (char*) (buf), (int) (len), 0, &host_addr,
+	SlSocklen_t from_len = sizeof(SlSockAddrIn_t);
+	ret = (int) sl_RecvFrom(fd, (char*)buf, (int)len, 0, (SlSockAddr_t *)host_addr,
 			&from_len);
 	if (ret < 0)
 	{
@@ -715,6 +716,7 @@ int mbedtls_net_recv(void *ctx, unsigned char *buf, size_t len)
 	return (ret);
 }
 
+#if 0
 /*
  * Read at most 'len' characters, blocking for at most 'timeout' ms
  */
@@ -750,6 +752,7 @@ int mbedtls_net_recv_timeout(void *ctx, unsigned char *buf, size_t len,
 	/* This call will not block */
 	return (mbedtls_net_recv(ctx, buf, len));
 }
+#endif
 
 /*
  * Write at most 'len' characters
