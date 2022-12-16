@@ -6,7 +6,7 @@
  */
 
 #include "uiso.h"
-#include "liblwm2m.h"
+#include "lwm2m_security.h"
 #include "../connection.h"
 
 #include "uiso_net_sockets.h"
@@ -108,10 +108,7 @@ const uint8_t own_key[] =
 		"O5Aj2mpZiWr4BElIZnl5R5V9l8wfX8ZysQ==\r\n"
 		"-----END EC PRIVATE KEY-----\r\n" };
 
-extern unsigned char* get_connection_psk(lwm2m_object_t *objectP,
-		uint16_t secObjInstID, size_t *psk_len);
-extern unsigned char* get_public_identiy(lwm2m_object_t *objectP,
-		uint16_t secObjInstID, size_t *public_identity_len);
+
 
 void mbedtls_cleanup(void);
 
@@ -120,6 +117,8 @@ int mbedtls_connector_initialize(lwm2m_object_t * securityObjP, uint16_t secObjI
 	int ret = -1;
 
 	/* Start with mbedtls init */
+	enum lwm2m_security_mode_e security_mode = get_security_mode(securityObjP, secObjInstID);
+
 
 	uiso_mbedtls_net_init(&net_context);
 	uiso_mbedtls_init_timer(&ssl_timer);
@@ -150,8 +149,7 @@ int mbedtls_connector_initialize(lwm2m_object_t * securityObjP, uint16_t secObjI
 		NULL, 0);
 	}
 
-	/* If PK */
-	if (0 == ret)
+	if ((0 == ret) && (security_mode_certificate == security_mode))
 	{
 		mbedtls_ssl_conf_groups(&ssl_config, groups);
 		mbedtls_ssl_conf_sig_algs(&ssl_config, sig_algorithms);
@@ -161,7 +159,7 @@ int mbedtls_connector_initialize(lwm2m_object_t * securityObjP, uint16_t secObjI
 		mbedtls_x509_crl_init(&peer_crl_ctx);
 	}
 
-	if (0 == ret)
+	if ((0 == ret) && (security_mode_psk == security_mode))
 	{
 		size_t psk_len = 0;
 		unsigned char *psk = get_connection_psk(securityObjP,
@@ -175,8 +173,9 @@ int mbedtls_connector_initialize(lwm2m_object_t * securityObjP, uint16_t secObjI
 				strlen((char*) public_identity));
 	}
 
-	if (0 == ret)
+	if ((0 == ret) && (security_mode_certificate == security_mode))
 	{
+		// Load certificates
 		ret = mbedtls_x509_crt_parse(&own_crt_ctx, own_cert, sizeof(own_cert));
 
 		if (0 == ret)
@@ -206,11 +205,11 @@ int mbedtls_connector_initialize(lwm2m_object_t * securityObjP, uint16_t secObjI
 
 	if (0 == ret)
 	{
-		if (0)
+		if (security_mode_certificate == security_mode)
 		{
 			mbedtls_ssl_conf_ciphersuites(&ssl_config, ciphersuites_pk);
 		}
-		else
+		else if(security_mode_psk == security_mode)
 		{
 			mbedtls_ssl_conf_ciphersuites(&ssl_config, ciphersuites_psk);
 		}

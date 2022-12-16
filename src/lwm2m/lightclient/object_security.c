@@ -41,59 +41,11 @@
  * Here we implement a very basic LWM2M Security Object which only knows NoSec security mode.
  */
 
-#include "liblwm2m.h"
+#include "lwm2m_security.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
+#include "uiso_config.h"
 #include "mbedtls/base64.h"
 
-enum{
-	lwm2m_security_uri = LWM2M_SECURITY_URI_ID,
-	lwm2m_security_bootstrap = LWM2M_SECURITY_BOOTSTRAP_ID,
-	lwm2m_security_mode = LWM2M_SECURITY_SECURITY_ID,
-	lwm2m_security_own_public_identity = LWM2M_SECURITY_PUBLIC_KEY_ID,
-	lwm2m_security_server_public_key = LWM2M_SECURITY_SERVER_PUBLIC_KEY_ID,
-	lwm2m_security_own_secret_key = LWM2M_SECURITY_SECRET_KEY_ID,
-	lwm2m_security_sms_security_mode = LWM2M_SECURITY_SMS_SECURITY_ID,
-	lwm2m_security_sms_key_binding = LWM2M_SECURITY_SMS_KEY_PARAM_ID,
-	lwm2m_security_sms_secret_key = LWM2M_SECURITY_SMS_SECRET_KEY_ID,
-	lwm2m_security_sms_server_number = LWM2M_SECURITY_SMS_SERVER_NUMBER_ID,
-	lwm2m_short_server_id = LWM2M_SECURITY_SHORT_SERVER_ID,
-	lwm2m_client_hold_off_time = LWM2M_SECURITY_HOLD_OFF_ID,
-	lwm2m_boostrap_server_timeout = LWM2M_SECURITY_BOOTSTRAP_TIMEOUT_ID,
-
-	/* Security v1.1 extensions */
-	lwm2m_matching_type = 13,
-	lwm2m_server_name_indication = 14,
-	lwm2m_certificate_usage = 15,
-	lwm2m_dtls_tls_ciphersuite =  16,
-	lwm2m_oscore_security_mode = 17,
-};
-
-enum lwm2m_security_mode_e {
-	security_mode_psk = LWM2M_SECURITY_MODE_PRE_SHARED_KEY,
-	security_mode_rpk = LWM2M_SECURITY_MODE_RAW_PUBLIC_KEY,
-	security_mode_certificate = LWM2M_SECURITY_MODE_CERTIFICATE,
-	security_mode_no_sec = LWM2M_SECURITY_MODE_NONE,
-	security_mode_est = 4
-};
-
-enum {
-	matching_type_exact_match = 0,
-	matching_type_exact_sha256 = 1,
-	matching_type_exact_sha384 = 2,
-	matching_type_exact_sha512 = 3,
-};
-
-#if 0
-const char default_server_uri[] = "coaps://192.168.16.103:5684";
-#else
-const char default_server_uri[] = "coaps://leshan.eclipseprojects.io:5684";
-#endif
-const char default_psk_id[] = "8af526a6-6766-11ed-9022-0242ac120002";
-const uint8_t default_psk[] = "cCn4e/HZ3qDE/OZHCww0bA==";
 //7029f87bf1d9dea0c4fce6470b0c346c
 typedef struct _security_instance_
 {
@@ -305,10 +257,10 @@ lwm2m_object_t * get_security_object()
         memset(targetP, 0, sizeof(security_instance_t));
         targetP->instanceId = 0;
 
-        strncpy(targetP->uri, default_server_uri, strlen(default_server_uri));
-        strncpy(targetP->public_identity, default_psk_id, strlen(default_psk_id));
+        strncpy(targetP->uri, config_get_lwm2m_uri(), strlen(config_get_lwm2m_uri()));
+        strncpy(targetP->public_identity, config_get_lwm2m_psk_id(), strlen(config_get_lwm2m_psk_id()));
         targetP->public_identity_len = strlen(targetP->public_identity) + 1;
-        mbedtls_base64_decode((unsigned char *)&(targetP->secret_key), sizeof(targetP->secret_key), &(targetP->secret_key_len), default_psk, strlen(default_psk));
+        mbedtls_base64_decode((unsigned char *)&(targetP->secret_key), sizeof(targetP->secret_key), &(targetP->secret_key_len), config_get_lwm2m_psk_key(), strlen(config_get_lwm2m_psk_key()));
 
         targetP->isBootstrap = false;
         targetP->shortID = 123;
@@ -359,7 +311,7 @@ char * get_server_uri(lwm2m_object_t * objectP,
 
 unsigned char * get_connection_psk(lwm2m_object_t * objectP, uint16_t secObjInstID, size_t * psk_len)
 {
-	uint8_t * psk;
+	uint8_t * psk = NULL;
     security_instance_t * targetP = (security_instance_t *)LWM2M_LIST_FIND(objectP->instanceList, secObjInstID);
 
     if (NULL != targetP)
@@ -373,7 +325,7 @@ unsigned char * get_connection_psk(lwm2m_object_t * objectP, uint16_t secObjInst
 
 unsigned char * get_public_identiy(lwm2m_object_t * objectP, uint16_t secObjInstID, size_t * public_identity_len)
 {
-	uint8_t * psk;
+	uint8_t * psk = NULL;
     security_instance_t * targetP = (security_instance_t *)LWM2M_LIST_FIND(objectP->instanceList, secObjInstID);
 
     if (NULL != targetP)
@@ -385,3 +337,15 @@ unsigned char * get_public_identiy(lwm2m_object_t * objectP, uint16_t secObjInst
 	return psk;
 }
 
+enum lwm2m_security_mode_e get_security_mode(lwm2m_object_t *objectP, uint16_t secObjInstID)
+{
+	enum lwm2m_security_mode_e security_mode = security_mode_no_sec;
+
+	 security_instance_t * targetP = (security_instance_t *)LWM2M_LIST_FIND(objectP->instanceList, secObjInstID);
+	 if(NULL != targetP)
+	 {
+		 security_mode = (enum lwm2m_security_mode_e)targetP->security_mode;
+	 }
+
+	return security_mode;
+}

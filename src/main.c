@@ -73,8 +73,10 @@
 #include "sl_device_init_hfrco.h"
 #include "sl_device_init_lfxo.h"
 
-#include "ff.h"
-#include "diskio.h"
+#define JSMN_STATIC
+#include "uiso_config.h"
+//#include "ff.h"
+//#include "diskio.h"
 
 #include "simplelink.h"
 #include "mbedtls/ssl.h"
@@ -208,6 +210,8 @@ void vApplicationMallocFailedHook(void)
 void vApplicationDaemonTaskStartupHook(void)
 {
 	sl_iostream_printf(sl_iostream_swo_handle, "Started FreeRTOS");
+
+	uiso_load_config();
 
 }
 

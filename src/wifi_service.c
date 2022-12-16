@@ -4,7 +4,7 @@
  *  Created on: 12 nov 2022
  *      Author: Francisco
  */
-
+#include "uiso_config.h"
 #include "wifi_service.h"
 
 #include "board_cc3100.h"
@@ -182,11 +182,11 @@ void wifi_task(void *param)
 	_u8 MacAddr[6] =
 	{ 0xD0, 0x5F, 0xB8, 0x4B, 0xD3, 0x74 };
 	SlSecParams_t secParams;
-	secParams.Key = (signed char*) "goodlife256";
-	secParams.KeyLen = strlen("goodlife256");
+	secParams.Key = (signed char*)config_get_wifi_key();
+	secParams.KeyLen = strlen(config_get_wifi_key());
 	secParams.Type = SL_SEC_TYPE_WPA_WPA2;
 
-	retVal = sl_WlanConnect("Francinet", strlen("Francinet"), 0, &secParams, NULL);
+	retVal = sl_WlanConnect(config_get_wifi_ssid(), strlen(config_get_wifi_ssid()), 0, &secParams, NULL);
 
 	/* Connection manager logic */
 	do
