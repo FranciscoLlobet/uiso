@@ -46,7 +46,7 @@
 #include "uiso_config.h"
 #include "mbedtls/base64.h"
 
-//7029f87bf1d9dea0c4fce6470b0c346c
+
 typedef struct _security_instance_
 {
     struct _security_instance_ * next;        // matches lwm2m_list_t::next

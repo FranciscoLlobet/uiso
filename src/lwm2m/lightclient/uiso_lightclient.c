@@ -70,6 +70,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "../../wifi_service.h"
 #include "lwm2m_temperature.h"
 
 extern TaskHandle_t user_task_handle;
@@ -87,12 +88,13 @@ extern void free_test_object(lwm2m_object_t *object);
 
 extern void* get_accelerometer_object(void);
 
-#define MAX_PACKET_SIZE 2048
+#define MAX_PACKET_SIZE			2048
+#define LWM2M_STEP_TIMEOUT		pdMS_TO_TICKS(10000)
 
 /* RX buffer */
 static uint8_t buffer[MAX_PACKET_SIZE];
 
-uint8_t* get_rx_buffer(void)
+static uint8_t* get_rx_buffer(void)
 {
 	return &buffer[0];
 }
@@ -102,6 +104,15 @@ int g_reboot = 0;
 enum dtls_authentication_mode
 {
 	DTLS_AUTHENTICATION_MODE_PK = 0, DTLS_AUTHENTICATION_MODE_PSK = 1
+};
+
+enum
+{
+	lwm2m_notify_registration = (1 << 0),
+	lwm2m_notify_timestamp = (1 << 1),
+	lwm2m_notify_temperature = (1 << 2),
+	lwm2m_notify_accelerometer = (1 << 3),
+	lwm2m_notify_message_reception = (1 << 4)
 };
 
 typedef struct
@@ -115,6 +126,8 @@ extern int mbedtls_connector_initialize(lwm2m_object_t *securityObjP,
 		uint16_t secObjInstID);
 extern void mbedtls_cleanup(void);
 extern void mbedtls_connector_close(void);
+
+int wait_for_rx(int fd, uint32_t wait_s);
 
 void* lwm2m_connect_server(uint16_t secObjInstID, void *userData)
 {
@@ -367,6 +380,9 @@ int lwm2m_client_task_runner(void *param1)
 	int result;
 	int opt;
 
+	/* Reset and clear the recieve buffer */
+	memset(buffer, 0, sizeof(buffer));
+
 	/* Reset the client_data_object */
 	memset(&data, 0, sizeof(client_data_t));
 	data.connection_context = (connection_t) &net_context;
@@ -431,26 +447,20 @@ int lwm2m_client_task_runner(void *param1)
 		return -1;
 	}
 
-	/*
-	 * We now enter in a while loop that will handle the communications from the server
-	 */
-	struct timeval tv =
-	{ .tv_sec = 0, .tv_usec = 0 };
-	fd_set readfds;
+	uint32_t lwm2m_timeout = 0;
 
 	do
 	{
-
 		uint32_t notification_value = 0;
 
 		if (pdTRUE == xTaskNotifyWait(0, UINT32_MAX, &notification_value, 0))
 		{
-			if (notification_value & (1 << 0))
+			if (notification_value & (uint32_t) lwm2m_notify_registration)
 			{
 				// Registration Timer
 				lwm2m_update_registration(lwm2mH, 0, false);
 			}
-			if (notification_value & (1 << 1))
+			if (notification_value & (uint32_t) lwm2m_notify_timestamp)
 			{
 				/* Update timestamp */
 				lwm2m_uri_t uri =
@@ -458,7 +468,7 @@ int lwm2m_client_task_runner(void *param1)
 						.resourceId = 13 };
 				lwm2m_resource_value_changed(lwm2mH, &uri);
 			}
-			if (notification_value & (1 << 2))
+			if (notification_value & (uint32_t) lwm2m_notify_temperature)
 			{
 				/* Update temperature object */
 				lwm2m_uri_t uri =
@@ -466,7 +476,7 @@ int lwm2m_client_task_runner(void *param1)
 						.resourceId = RESOURCE_ID_SENSOR_VALUE };
 				lwm2m_resource_value_changed(lwm2mH, &uri);
 			}
-			if (notification_value & (1 << 3))
+			if (notification_value & (uint32_t) lwm2m_notify_accelerometer)
 			{
 				/* Update accelerometer object */
 				lwm2m_uri_t uri =
@@ -479,53 +489,18 @@ int lwm2m_client_task_runner(void *param1)
 				uri.resourceId = 5704;
 				lwm2m_resource_value_changed(lwm2mH, &uri);
 			}
-		}
-		else
-		{
-
-		}
-
-		print_state(lwm2mH);
-
-		/* Perform LWM2M step*/
-		time_t timeout_val = 60;
-
-		result = lwm2m_step(lwm2mH, &timeout_val);
-		if (result != 0)
-		{
-			fprintf(stderr, "lwm2m_step() failed: 0x%X\r\n", result);
-			// Go to error condition
-			break;
-		}
-
-		// connection state ?
-
-
-		/* Check if something is pending */
-		if (result == 0)
-		{
-			FD_ZERO(&readfds);
-			FD_SET(data.connection_context->fd, &readfds);
-			tv.tv_sec = 0; //timeout_val;
-			tv.tv_usec = 100000;
-
-			result = select(FD_SETSIZE, &readfds, NULL, NULL, &tv);
-		}
-
-		if (result > 0)
-		{
-			ssize_t numBytes = 0;
-
-			/*
-			 * If an event happens on the socket
-			 */
-			if (FD_ISSET(data.connection_context->fd, &readfds))
+			if (notification_value & (uint32_t) lwm2m_notify_message_reception)
 			{
-				do{
+
+				/* Handle reception */
+				ssize_t numBytes = -1;
+				do
+				{
 					numBytes = mbedtls_ssl_read(
-							data.connection_context->ssl_context, get_rx_buffer(),
+							data.connection_context->ssl_context,
+							get_rx_buffer(),
 							MAX_PACKET_SIZE);
-				}while((numBytes == MBEDTLS_ERR_SSL_WANT_WRITE)
+				} while ((numBytes == MBEDTLS_ERR_SSL_WANT_WRITE)
 						|| (numBytes == MBEDTLS_ERR_SSL_ASYNC_IN_PROGRESS)
 						|| (numBytes == MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS)
 						|| (numBytes == MBEDTLS_ERR_SSL_CLIENT_RECONNECT));
@@ -540,33 +515,61 @@ int lwm2m_client_task_runner(void *param1)
 					connection_t connP = data.connection_context;
 
 					/* Let liblwm2m respond to the query depending on the context */
-					lwm2m_handle_packet(lwm2mH, buffer, (size_t) numBytes,
-							connP);
+					lwm2m_handle_packet(lwm2mH, get_rx_buffer(),
+							(size_t) numBytes, connP);
 				}
 				else
 				{
 					/* Close DTLS session and perform handshake */
-					do{
-						result = mbedtls_ssl_close_notify(data.connection_context->ssl_context);
-					}while((MBEDTLS_ERR_SSL_WANT_READ == result)||(MBEDTLS_ERR_SSL_WANT_WRITE == result));
-
-					result = mbedtls_ssl_session_reset(data.connection_context->ssl_context);
-
-					if(0 == result)
+					do
 					{
-						do {
-							result = mbedtls_ssl_handshake(data.connection_context->ssl_context);
-						}while((MBEDTLS_ERR_SSL_WANT_READ == result) || (MBEDTLS_ERR_SSL_WANT_WRITE == result));
+						result = mbedtls_ssl_close_notify(
+								data.connection_context->ssl_context);
+					} while ((MBEDTLS_ERR_SSL_WANT_READ == result)
+							|| (MBEDTLS_ERR_SSL_WANT_WRITE == result));
+
+					result = mbedtls_ssl_session_reset(
+							data.connection_context->ssl_context);
+
+					if (0 == result)
+					{
+						do
+						{
+							result = mbedtls_ssl_handshake(
+									data.connection_context->ssl_context);
+						} while ((MBEDTLS_ERR_SSL_WANT_READ == result)
+								|| (MBEDTLS_ERR_SSL_WANT_WRITE == result));
 					}
 
-					if(0 != result)
+					if (0 != result)
 					{
 						// TLS Connection did not work
 					}
 				}
-
 			}
-		} // Handle data
+		}
+		else
+		{
+			// No notifications pending
+		}
+
+		print_state(lwm2mH);
+
+		/* Perform LWM2M step*/
+		time_t timeout_val = 60;
+
+		result = lwm2m_step(lwm2mH, &timeout_val);
+		if (result != 0)
+		{
+			fprintf(stderr, "lwm2m_step() failed: 0x%X\r\n", result);
+			// Go to error condition
+			break;
+		}
+		else
+		{
+			lwm2m_timeout = 1000 * (uint32_t) timeout_val;
+			wait_for_rx(data.connection_context->fd, timeout_val);
+		}
 	} while (1);
 
 	/*
@@ -579,6 +582,8 @@ int lwm2m_client_task_runner(void *param1)
 	free_security_object(objArray[0]);
 	free_server_object(objArray[1]);
 	free_object_device(objArray[2]);
+	free_object_device(objArray[3]);
+	free_object_device(objArray[4]);
 	//free_test_object(objArray[3]);
 
 	fprintf(stdout, "\r\n\n");
@@ -590,7 +595,8 @@ void lwm2m_client_update_temperature(float temperature)
 {
 	write_temperature(temperature);
 
-	xTaskNotify(user_task_handle, (1 << 2), eSetBits);
+	xTaskNotify(user_task_handle, (uint32_t )lwm2m_notify_temperature,
+			eSetBits);
 }
 
 extern void update_accelerometer_values(float x, float y, float z);
@@ -599,5 +605,22 @@ void lwm2m_client_update_accel(float x, float y, float z)
 {
 	update_accelerometer_values(x, y, z);
 
-	xTaskNotify(user_task_handle, (1 << 3), eSetBits);
+	xTaskNotify(user_task_handle, (uint32_t )lwm2m_notify_accelerometer,
+			eSetBits);
 }
+
+int wait_for_rx(int fd, uint32_t wait_s)
+{
+	int ret = 0;
+	uint32_t notification_value = 0;
+	ret = enqueue_select_rx(fd, xTaskGetCurrentTaskHandle(),
+			(uint32_t) lwm2m_notify_message_reception, wait_s);
+
+	if(pdTRUE == xTaskNotifyWaitIndexed( 1, 0, (uint32_t)lwm2m_notify_message_reception, &notification_value, (wait_s + (uint32_t)1)* 1000))
+	{
+		xTaskNotify(xTaskGetCurrentTaskHandle(), (uint32_t )lwm2m_notify_message_reception, eSetBits);
+	}
+
+	return ret;
+}
+

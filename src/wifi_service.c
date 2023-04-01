@@ -11,14 +11,16 @@
 
 #include "simplelink.h"
 #include "uiso_ntp.h"
+#include <stdbool.h>
 
-#define WIFI_TASK_PRIORITY    (UBaseType_t)( uiso_rtos_prio_above_normal )
+#define WIFI_TASK_PRIORITY      (UBaseType_t)( uiso_rtos_prio_above_normal )
+#define SELECT_TASK_PRIORITY    (UBaseType_t)( uiso_task_runtime_services )
 
 extern int lwm2m_client_task_runner(void * param1);
 
-//TimerHandle_t wlan_timer = NULL;
 TimerHandle_t sntp_sync_timer = NULL;
 TaskHandle_t wifi_task_handle = NULL;
+TaskHandle_t select_task_handle = NULL;
 SemaphoreHandle_t wifi_event_semaphore = NULL;
 
 /* Wifi Queue Handle */
@@ -39,6 +41,13 @@ QueueHandle_t wifi_queue_handle = NULL;
 
 #define WIFI_NTP_SYNC_TIMER			(1 << 8)
 #define WIFI_NTP_TIME_SYNCED		(1 << 9)
+#define WIFI_NTP_REQUEST_SENT       (1 << 10)
+
+#define WIFI_RX_DATA				(1 << 11)
+#define WIFI_RX_NTP_DATA			(1 << 12)
+#define WIFI_RX_LWM2M_DATA			(1 << 13)
+#define WIFI_RX_MQTT_DATA			(1 << 14)
+#define WIFI_RX_HTTP_DATA			(1 << 15)
 #define WIFI_EVENT_MANAGER_TIMEOUT    (pdMS_TO_TICKS(24000))
 
 #define WIFI_NTP_SYNC_PERIOD		(12*3600*1000) /* Sync for at least one hour */
@@ -65,7 +74,8 @@ enum wifi_ip_acquired_state_e
 
 enum{
 	wifi_ntp_timer = WIFI_NTP_SYNC_TIMER,
-	wifi_ntp_synced_event = WIFI_NTP_TIME_SYNCED
+	wifi_ntp_synced_event = WIFI_NTP_TIME_SYNCED,
+	wifi_ntp_request_sent = WIFI_NTP_REQUEST_SENT,
 };
 
 enum
@@ -78,6 +88,104 @@ struct wifi_status_s
 	enum wifi_connection_state_e connection;
 	enum wifi_ip_acquired_state_e ip;
 } wifi_status;
+
+struct rx_socket_management_s
+{
+	_i16 sd;
+	TaskHandle_t task_handle;
+	uint32_t notification_value;
+};
+
+struct rx_socket_management_s rx_sockets[wifi_service_max];
+
+static void initialize_socket_management(void)
+{
+	for(size_t i = 0; i< (size_t)wifi_service_max; i++)
+	{
+		rx_sockets[i].sd = -1;
+		rx_sockets[i].task_handle = (TaskHandle_t)NULL;
+		rx_sockets[i].notification_value = 0;
+	}
+}
+
+void wifi_service_register_rx_socket(enum wifi_socket_id_e id, int sd, TaskHandle_t task_handle, uint32_t notification_value)
+{
+	rx_sockets[(size_t)id].sd = sd;
+	rx_sockets[(size_t)id].task_handle = task_handle;
+	rx_sockets[(size_t)id].notification_value = notification_value;
+}
+
+
+struct rx_queue_s
+{
+	int32_t fd;
+	uint32_t timeout_s;
+	TaskHandle_t task_handle;
+	uint32_t task_notification_value;
+
+};
+
+
+static QueueHandle_t rx_queue = NULL;
+
+static void select_task(void *param)
+{
+	(void)param;
+	struct rx_queue_s rx_queue_item;
+
+	memset(&rx_queue_item, 0, sizeof(rx_queue_item));
+
+	rx_queue = xQueueCreate( 2, sizeof(struct rx_queue_s));
+	if(NULL == rx_queue)
+	{
+		// Error!
+	}
+
+	vTaskSuspend(NULL);
+
+	do
+	{
+		if(pdTRUE == xQueueReceive(rx_queue, &rx_queue_item, pdMS_TO_TICKS(10000)))
+		{
+			fd_set read_fd_set;
+			struct timeval tv =	{ .tv_sec = rx_queue_item.timeout_s, .tv_usec = 0 };
+
+			FD_ZERO(&read_fd_set);
+			FD_SET(rx_queue_item.fd, &read_fd_set);
+
+			int result = sl_Select(FD_SETSIZE, &read_fd_set, NULL, NULL, &tv);
+
+			if(result > 0)
+			{
+				if(FD_ISSET(rx_queue_item.fd, &read_fd_set))
+				{
+					xTaskNotifyIndexed(rx_queue_item.task_handle, 1, rx_queue_item.task_notification_value, eSetBits);
+				}
+			}
+		}
+		else
+		{
+			printf("Select Task Tick\n\r");
+		}
+	}while(1);
+}
+
+int enqueue_select_rx(int sd, TaskHandle_t task_handle, uint32_t notification_value, uint32_t timeout_s)
+{
+	int ret_value = -1;
+	struct rx_queue_s rx_queue_item;
+	rx_queue_item.fd = sd;
+	rx_queue_item.task_handle = task_handle;
+	rx_queue_item.task_notification_value = notification_value;
+	rx_queue_item.timeout_s = timeout_s;
+
+	if(pdTRUE == xQueueSend( rx_queue, &rx_queue_item, portMAX_DELAY))
+	{
+		ret_value = 0;
+	}
+
+	return ret_value;
+}
 
 void sntp_sync_timer_callback(TimerHandle_t pxTimer)
 {
@@ -100,7 +208,9 @@ void wifi_task(void *param)
 
 	wifi_status.connection = wifi_disconnected;
 
-	role = sl_Start(NULL, CC3100_DEVICE_NAME, NULL);
+	initialize_socket_management();
+
+	role = sl_Start(NULL, (_i8*)CC3100_DEVICE_NAME, NULL);
 	switch ((SlWlanMode_e) role)
 	{
 	case ROLE_STA:
@@ -123,7 +233,7 @@ void wifi_task(void *param)
 	{ 0 };
 	_u8 configOpt = SL_DEVICE_GENERAL_VERSION;
 	_u8 configLen = sizeof(ver);
-	volatile _i32 retVal = sl_DevGet(SL_DEVICE_GENERAL_CONFIGURATION,
+	_i32 retVal = sl_DevGet(SL_DEVICE_GENERAL_CONFIGURATION,
 			&configOpt, &configLen, (_u8*) (&ver));
 
 	/* Set connection policy to Auto + SmartConfig (Device's default connection policy) */
@@ -179,14 +289,13 @@ void wifi_task(void *param)
 
 	/* Start Wifi Connection */
 	wifi_status.connection = wifi_connecting;
-	_u8 MacAddr[6] =
-	{ 0xD0, 0x5F, 0xB8, 0x4B, 0xD3, 0x74 };
+	/*_u8 MacAddr[6] =  0xD0, 0x5F, 0xB8, 0x4B, 0xD3, 0x74 }; */
 	SlSecParams_t secParams;
 	secParams.Key = (signed char*)config_get_wifi_key();
 	secParams.KeyLen = strlen(config_get_wifi_key());
 	secParams.Type = SL_SEC_TYPE_WPA_WPA2;
 
-	retVal = sl_WlanConnect(config_get_wifi_ssid(), strlen(config_get_wifi_ssid()), 0, &secParams, NULL);
+	retVal = sl_WlanConnect((_i8*)config_get_wifi_ssid(), (_i16)strlen(config_get_wifi_ssid()), NULL, &secParams, NULL);
 
 	/* Connection manager logic */
 	do
@@ -195,7 +304,7 @@ void wifi_task(void *param)
 		{
 			sl_iostream_printf(sl_iostream_swo_handle, "Event: %x\n\r", ulNotifiedValue);
 
-			if(ulNotifiedValue & wifi_connected)
+			if(ulNotifiedValue & (uint32_t)wifi_connected)
 			{
 				if(0 == sntp_is_synced())
 				{
@@ -205,15 +314,17 @@ void wifi_task(void *param)
 				sl_iostream_printf(sl_iostream_swo_handle, "Wifi Connected %x\n\r", ulNotifiedValue);
 			}
 
-			if(ulNotifiedValue & wifi_disconnected)
+			if(ulNotifiedValue & (uint32_t)wifi_disconnected)
 			{
+				// When disconnected, stop ntp sync timer
 				if(pdTRUE == xTimerIsTimerActive(sntp_sync_timer))
 				{
 					xTimerStop(sntp_sync_timer, portMAX_DELAY);
 				}
 
+				// Suspend LWM2M Task
 				vTaskSuspend(user_task_handle);
-
+				vTaskSuspend(select_task_handle);
 				sl_iostream_printf(sl_iostream_swo_handle, "Wifi Disconnected %x\n\r", ulNotifiedValue);
 			}
 
@@ -225,6 +336,11 @@ void wifi_task(void *param)
 			if(ulNotifiedValue & (uint32_t)wifi_ip_v6_acquired)
 			{
 				sl_iostream_printf(sl_iostream_swo_handle, "IPv6 Acquired %x\n\r", ulNotifiedValue);
+			}
+
+			if(ulNotifiedValue & ((uint32_t)wifi_ip_v4_acquired | (uint32_t)wifi_ip_v6_acquired))
+			{
+				vTaskResume(select_task_handle);
 			}
 
 			if(ulNotifiedValue & (uint32_t)wifi_ip_released)
@@ -252,13 +368,11 @@ void wifi_task(void *param)
 					time_to_next_sync = WIFI_NTP_SYNC_PERIOD;
 				}
 
+				/* Restart the NTP sync timer */
 				if(sntp_rcode == sntp_success)
 				{
 					xTimerChangePeriod( sntp_sync_timer, pdMS_TO_TICKS(time_to_next_sync), portMAX_DELAY);
-					xTaskNotify(wifi_task_handle, (wifi_ntp_synced_event | WIFI_PENDING_STATE), eSetBits);
-
-					//vTaskResume(user_task_handle);// test
-
+					xTaskNotify(wifi_task_handle, ((uint32_t)wifi_ntp_synced_event | WIFI_PENDING_STATE), eSetBits);
 				}
 				else
 				{
@@ -270,21 +384,17 @@ void wifi_task(void *param)
 
 			if(ulNotifiedValue & (uint32_t)wifi_ntp_synced_event)
 			{
+				// Resume select task
+				//vTaskResume(select_task_handle);
 				// Resume LWM2M Task
 				vTaskResume(user_task_handle);
+
 			}
-
-
 		}
 		else
 		{
 			sl_iostream_printf(sl_iostream_swo_handle, "No event\n\r");
 		}
-
-
-
-
-		//
 
 	} while (1);
 
@@ -294,6 +404,10 @@ void create_wifi_service_task(void)
 {
 	xTaskCreate(wifi_task, "WifiService", configMINIMAL_STACK_SIZE + 1024, NULL,
 	WIFI_TASK_PRIORITY, &wifi_task_handle);
+
+	xTaskCreate(select_task, "SelectTask", configMINIMAL_STACK_SIZE + 100, NULL,
+	SELECT_TASK_PRIORITY, &select_task_handle);
+
 
 	sntp_sync_timer = xTimerCreate("ntpService", 1000, pdTRUE, NULL, sntp_sync_timer_callback);
 }

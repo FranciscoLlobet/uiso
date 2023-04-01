@@ -83,6 +83,9 @@
 
 int main(int argc, char *argv[])
 {
+	(void)argc;
+	(void)argv;
+
 	CHIP_Init();
 	MSC_Init();
 

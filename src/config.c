@@ -18,6 +18,9 @@ char config_lwm2m_uri[128];
 char config_lwm2m_psk_id[128];
 char config_lwm2m_psk_key[64];
 
+char config_ntp_url[64];
+
+
 char* config_get_wifi_ssid(void)
 {
 	return (char*) &config_wifi_ssid[0];
@@ -68,7 +71,6 @@ void uiso_load_config(void)
 		{
 			read_buffer = pvPortMalloc(fSize);
 		}
-
 	}
 
 	if (FR_OK == fRes)
@@ -80,7 +82,7 @@ void uiso_load_config(void)
 	{
 
 		int parse_result = 0;
-		parse_result = jsmn_parse(&parser, read_buffer, (size_t) fRead,
+		parse_result = jsmn_parse(&parser, (const char *)read_buffer, (size_t) fRead,
 		NULL, 0);
 		if (parse_result > 0)
 		{
@@ -89,7 +91,7 @@ void uiso_load_config(void)
 
 		jsmn_init(&parser);
 
-		parse_result = jsmn_parse(&parser, read_buffer, (size_t) fRead,
+		parse_result = jsmn_parse(&parser, (const char *)read_buffer, (size_t) fRead,
 				json_tokens, parse_result);
 
 		/* Find Wlan Key */
@@ -97,6 +99,8 @@ void uiso_load_config(void)
 		int lwm2m_key = INT8_MIN;
 		int ntp_key = INT8_MIN;
 		int lwm2m_psk_key = INT8_MIN;
+		int ntp_url_key = INT8_MIN;
+		int ntp_url_array = INT8_MIN;
 
 		for (int i = 0; i < parse_result; i++)
 		{
@@ -186,7 +190,22 @@ void uiso_load_config(void)
 			else if (((ntp_key + 1) == json_tokens[i].parent)
 					&& (json_tokens[i].type == JSMN_STRING))
 			{
-				// process ntp keys
+				if(0 == strncmp(json_key, "url", strlen("url")))
+				{
+					ntp_url_key = i;
+				}
+			}
+			else if(((ntp_url_key) == json_tokens[i].parent) && (json_tokens[i].type == JSMN_ARRAY))
+			{
+				ntp_url_array = i;
+
+
+			}
+			else if((ntp_url_array == json_tokens[i].parent) && (json_tokens[i].type == JSMN_STRING))
+			{
+				// Push NTP url
+				size_t src_len = json_tokens[i].end - json_tokens[i].start;
+				strncpy(&config_ntp_url[0], (char*)read_buffer + json_tokens[i].start, src_len );
 			}
 			else if (((lwm2m_psk_key + 1) == json_tokens[i].parent)
 					&& (json_tokens[i].type == JSMN_STRING))
