@@ -612,11 +612,7 @@ void lwm2m_client_update_accel(float x, float y, float z)
 int wait_for_rx(int fd, uint32_t wait_s)
 {
 	int ret = 0;
-	uint32_t notification_value = 0;
-	ret = enqueue_select_rx(fd, xTaskGetCurrentTaskHandle(),
-			(uint32_t) lwm2m_notify_message_reception, wait_s);
-
-	if(pdTRUE == xTaskNotifyWaitIndexed( 1, 0, (uint32_t)lwm2m_notify_message_reception, &notification_value, (wait_s + (uint32_t)1)* 1000))
+	if(0 == enqueue_select_rx(wifi_service_lwm2m_socket, fd, wait_s))
 	{
 		xTaskNotify(xTaskGetCurrentTaskHandle(), (uint32_t )lwm2m_notify_message_reception, eSetBits);
 	}

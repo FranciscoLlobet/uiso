@@ -24,10 +24,10 @@ enum wifi_socket_id_e
 	wifi_service_max
 };
 
-void wifi_service_register_rx_socket(enum wifi_socket_id_e id, int sd, TaskHandle_t task_handle, uint32_t notification_value );
+void wifi_service_register_rx_socket(enum wifi_socket_id_e id, int sd, uint32_t timeout_s);
 
-int enqueue_select_rx(int sd, TaskHandle_t task_handle, uint32_t notification_value, uint32_t timeout_s);
-
+int enqueue_select_rx(enum wifi_socket_id_e id, int sd, uint32_t timeout_s);
+int enqueue_select_tx(enum wifi_socket_id_e id, int sd, uint32_t timeout_s);
 
 void create_wifi_service_task(void);
 

@@ -1,6 +1,14 @@
 /*
  * uiso_ntp.h
  *
+ * Embedded implementation for sNTP client
+ *
+ * Implements RFC4430 (2006)
+ * Simple Network Time Protocol (SNTP) Version 4 for IPv4, IPv6 and OSI
+ *
+ * Also reference SNTP v3
+ * https://www.rfc-editor.org/rfc/rfc1769
+ *
  *  Created on: 13 nov 2022
  *      Author: Francisco
  */
@@ -16,7 +24,9 @@
 
 #define NTP_APPLICATION_START_DELAY_MS  UINT32_C(16000) /* Application start delay */
 
-
+/**
+ * NTP Packet definition
+ */
 struct ntp_packet_s
 {
 	uint8_t leap_version_mode; /* Leap-Version-Mode Byte*/
@@ -37,6 +47,8 @@ struct ntp_packet_s
 	// uint8_t key_identifier[4]; /* Optional */
 	// uint8_t message_digest[16]; /* Optional */
 };
+
+
 
 #define SNTP_LI0_BYTE_IDX	6
 #define SNTP_LI1_BYTE_IDX   7
@@ -81,7 +93,6 @@ enum sntp_vn_e
 	sntp_version_2 = ((2 << SNTP_VN0_BYTE_IDX) & SNTP_VN_MASK),
 	sntp_version_3 = ((3 << SNTP_VN0_BYTE_IDX) & SNTP_VN_MASK),
 	sntp_version_4 = ((4 << SNTP_VN0_BYTE_IDX) & SNTP_VN_MASK),
-	// sntp_version_5 = ((5 << SNTP_VN0_BYTE_IDX) & SNTP_VN_MASK),
 };
 
 enum sntp_mode_e
@@ -148,15 +159,24 @@ enum sntp_poll_interval_e
 
 enum sntp_return_codes_e{
 	sntp_success = (uint32_t)0,
+
+	sntp_null_pointer,
+	sntp_invalid_version,
+
 	sntp_server_no_server,
 	sntp_server_ip_dns_error, /* Server ip could not be resolved */
 	sntp_server_ip_error, /* Error while sending or receiving packet */
 	sntp_server_ip_mismatch, /* Server reply did not come from requested server */
 
+	/* Reply errors */
 	sntp_server_reply_header_error, /* Reply header error */
 	sntp_server_reply_kod, /* Kiss-of-Death reply*/
 	sntp_server_reply_invalid,
+	sntp_server_transmit_zero,
+
 	sntp_timestamp_format_error,
+
+	/* Other errors */
 	sntp_set_rtc_error,
 	sntp_set_simplelink_error,
 
@@ -183,6 +203,17 @@ struct sntp_server_s
 
 typedef struct sntp_server_s sntp_server_t;
 
+struct ntp_parsed_response_s
+{
+	enum sntp_vn_e version;
+	enum sntp_stratum_e stratum;
+
+	uint32_t poll_interval;
+};
+
+
+
+
 
 enum sntp_return_codes_e uiso_sntp_request(sntp_server_t* server, uint32_t * time_to_next_sync);
 
@@ -190,5 +221,9 @@ sntp_server_t* select_server_from_list(void);
 
 uint32_t sntp_is_synced(void);
 
+
+
+enum sntp_return_codes_e sntp_packet_create_request(struct ntp_packet_s *packet,
+		uint32_t originate, uint32_t originate_frac, enum sntp_vn_e version);
 
 #endif /* UISO_NTP_H_ */
