@@ -182,13 +182,15 @@ int main(int argc, char *argv[])
 	//create_user_task();
 	sl_iostream_printf(sl_iostream_swo_handle, "Starting FreeRTOS\n\r");
 
-	create_user_task();
+	create_user_task(); /* Create LWM2M task */
+
+	initialize_mqtt_client(); /* Create MQTT task */
 
 	create_wifi_service_task();
 
 	create_sensor_task();
 
-	VStartSimpleLinkSpawnTask(uiso_task_connectivity_service);
+	VStartSimpleLinkSpawnTask((unsigned portBASE_TYPE)uiso_task_connectivity_service);
 
 	vTaskStartScheduler();
 
