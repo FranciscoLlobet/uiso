@@ -1,0 +1,3 @@
+[submodule "system/src/wakaama"]
+	path = system/src/wakaama
+	url = git@github.com:FranciscoLlobet/wakaama.git
