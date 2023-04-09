@@ -203,7 +203,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_xTimerGetTimerDaemonTaskHandle	( 0 )
 #define INCLUDE_eTaskGetState					( 1 )
 #define INCLUDE_xTimerPendFunctionCall			( 1 )
-
+#define INCLUDE_xSemaphoreGetMutexHolder        ( 1 )
 /* Stop if an assertion fails. */
 #define configASSERT( x )	if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
 

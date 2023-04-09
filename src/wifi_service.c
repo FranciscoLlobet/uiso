@@ -11,19 +11,17 @@
 
 #include "simplelink.h"
 #include "uiso_ntp.h"
-#include <stdbool.h>
 #include "sl_sleeptimer.h"
 
 #include "mqtt/mqtt_client.h"
 
 #define WIFI_TASK_PRIORITY      (UBaseType_t)( uiso_rtos_prio_above_normal )
-#define SELECT_TASK_PRIORITY    (UBaseType_t)( uiso_task_runtime_services )
+
 
 extern int lwm2m_client_task_runner(void *param1);
 
 TimerHandle_t sntp_sync_timer = NULL;
 TaskHandle_t wifi_task_handle = NULL;
-TaskHandle_t select_task_handle = NULL;
 SemaphoreHandle_t wifi_event_semaphore = NULL;
 
 /* Wifi Queue Handle */
@@ -90,336 +88,6 @@ struct wifi_status_s
 	enum wifi_ip_acquired_state_e ip;
 } wifi_status;
 
-struct socket_management_s
-{
-	int16_t sd; /* Socket Descriptor */
-	uint32_t deadline_s;
-	SemaphoreHandle_t queue_handle;
-	SemaphoreHandle_t signal_semaphore;
-};
-
-struct socket_management_s rx_sockets[wifi_service_max];
-struct socket_management_s tx_sockets[wifi_service_max];
-
-static void initialize_socket_management(void)
-{
-	for (size_t i = 0; i < (size_t) wifi_service_max; i++)
-	{
-		rx_sockets[i].sd = -1;
-		rx_sockets[i].deadline_s = 0;
-		rx_sockets[i].queue_handle = xSemaphoreCreateMutex();
-		rx_sockets[i].signal_semaphore = xSemaphoreCreateBinary();
-		(void)xSemaphoreTake( rx_sockets[i].signal_semaphore,0 );
-
-	}
-	for (size_t i = 0; i < (size_t) wifi_service_max; i++)
-	{
-		tx_sockets[i].sd = -1;
-		tx_sockets[i].deadline_s = 0;
-		tx_sockets[i].queue_handle = xSemaphoreCreateMutex();
-		tx_sockets[i].signal_semaphore = xSemaphoreCreateBinary();
-		(void)xSemaphoreTake( rx_sockets[i].signal_semaphore,0 );
-	}
-}
-
-void wifi_service_register_rx_socket(enum wifi_socket_id_e id, int sd, uint32_t timeout_s)
-{
-	rx_sockets[(size_t) id].sd = sd;
-	rx_sockets[(size_t) id].deadline_s = (uint32_t) sl_sleeptimer_get_time() + timeout_s;
-}
-
-void wifi_service_register_tx_socket(enum wifi_socket_id_e id, int sd, uint32_t timeout_s)
-{
-	tx_sockets[(size_t) id].sd = sd;
-	tx_sockets[(size_t) id].deadline_s = (uint32_t) sl_sleeptimer_get_time() + timeout_s;
-}
-
-struct rx_queue_s
-{
-	int32_t fd;
-	uint32_t timeout_s;
-	uint32_t timeout_ms;
-	TaskHandle_t task_handle;
-	QueueHandle_t queue_handle;
-	uint32_t task_notification_value;
-	char *rx_tx_buf;
-	int32_t rx_tx_buf_len;
-
-	uint32_t deadline_s; /* Deadline */
-
-};
-
-static QueueHandle_t rx_queue = NULL;
-
-static void select_task(void *param)
-{
-	(void) param;
-	struct rx_queue_s rx_queue_item;
-
-	memset(&rx_queue_item, 0, sizeof(rx_queue_item));
-
-	// Add network mutex
-	vTaskSuspend(NULL);
-
-	fd_set read_fd_set;
-	fd_set write_fd_set;
-
-	do
-	{
-		// Reset the pointers
-		fd_set * read_set_ptr = NULL;
-		fd_set * write_fd_set_ptr = NULL;
-		FD_ZERO(&read_fd_set);
-		FD_ZERO(&write_fd_set);
-
-		size_t i = 0;
-
-		uint32_t timeout_min = 5; //UINT32_MAX;
-		uint32_t current_time = sl_sleeptimer_get_time();
-		for (i = 0; i < (size_t) wifi_service_max; i++)
-		{
-			uint32_t current_timeout = 0;
-			struct socket_management_s *rx_socket = &rx_sockets[i];
-			struct socket_management_s *tx_socket = &tx_sockets[i];
-
-			if (rx_socket->sd > 0)
-			{
-				// Get the timeout
-				if(rx_socket->deadline_s != 0)
-				{
-					if(rx_socket->deadline_s >= current_time)
-					{
-						current_timeout = rx_socket->deadline_s - current_time;
-						if (timeout_min > current_timeout)
-						{
-							timeout_min = current_timeout;
-						}
-
-						FD_SET(rx_socket->sd, &read_fd_set);
-						read_set_ptr = &read_fd_set;
-					}
-					else
-					{
-						rx_socket->deadline_s = 0;
-					}
-				}
-
-			} // Checking rx sockets
-			if (tx_socket->sd > 0)
-			{
-				// Get the timeout
-				if (tx_socket->deadline_s != 0)
-				{
-					if(tx_socket->deadline_s >= current_time)
-					{
-						current_timeout = tx_socket->deadline_s - current_time;
-						if (timeout_min > current_timeout)
-						{
-							timeout_min = current_timeout;
-						}
-
-						FD_SET(tx_socket->sd, &write_fd_set);
-						write_fd_set_ptr = &write_fd_set;
-					}
-					else
-					{
-						tx_socket->deadline_s = 0;
-					}
-				}
-			} // Checking tx sockets
-
-		}
-
-		if ((read_set_ptr != NULL) || (write_fd_set_ptr != NULL))
-		{
-			struct timeval tv =
-			{ .tv_sec = timeout_min, .tv_usec = 0 };
-			int result = sl_Select(FD_SETSIZE, read_set_ptr, write_fd_set_ptr, NULL, &tv);
-			if(result > 0)
-			{
-				if (read_set_ptr != NULL)
-				{
-					for (i = 0; i < (size_t) wifi_service_max; i++)
-					{
-						if(rx_sockets[i].sd > 0)
-						{
-							if (FD_ISSET(rx_sockets[i].sd, read_set_ptr))
-							{
-								rx_sockets[i].deadline_s = 0;
-								xSemaphoreGive( rx_sockets[i].signal_semaphore );
-							}
-						}
-					}
-				}
-				if (write_fd_set_ptr != NULL)
-				{
-					for (i = 0; i < (size_t) wifi_service_max; i++)
-					{
-						if(tx_sockets[i].sd > 0)
-						{
-							if (FD_ISSET(tx_sockets[i].sd, write_fd_set_ptr))
-							{
-								tx_sockets[i].deadline_s = 0;
-								xSemaphoreGive( tx_sockets[i].signal_semaphore );
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				//
-			}
-		} else
-		{
-			uint32_t notification_counter;
-			(void)xTaskGenericNotifyWait( 0, 0, UINT32_MAX, &notification_counter, portMAX_DELAY);
-			printf("RX counter %d\n\r", notification_counter);
-		}
-
-
-
-
-
-
-	} while (1);
-
-#if 0
-	do
-	{
-		uint32_t notification_value = 0;
-
-		if (pdTRUE == xTaskNotifyWait((uint32_t )0, UINT32_MAX, &notification_value, portMAX_DELAY))
-		{
-			/* Clear Select TX queue */
-			while (pdTRUE == xQueueReceive(tx_queue, &rx_queue_item, 0)) // expiration time?
-			{
-				//
-
-
-				bool send_to = ((rx_queue_item.rx_tx_buf != NULL)&&(rx_queue_item.rx_tx_buf_len != 0));
-				uint32_t task_notification_value = 0;
-				if(rx_queue_item.timeout_s != 0)
-				{
-					FD_ZERO(&write_fd_set);
-					FD_SET(rx_queue_item.fd, &write_fd_set);
-					struct timeval tv =
-					{ .tv_sec = rx_queue_item.timeout_s, .tv_usec = 0 };
-					int result = sl_Select(FD_SETSIZE, NULL, &write_fd_set, NULL, &tv);
-					if (result > 0)
-					{
-						if (FD_ISSET(rx_queue_item.fd, &write_fd_set))
-						{
-							task_notification_value = rx_queue_item.task_notification_value;
-						}
-						else
-						{
-							send_to = false;
-							task_notification_value = UINT32_MAX;
-						}
-					}
-				}
-				if(send_to)
-				{
-					//
-				}
-				if(NULL != rx_queue_item.task_handle)
-				{
-					xTaskNotifyIndexed(rx_queue_item.task_handle, 1, notification_value, eSetBits);
-				}
-			}
-			/* Clear Select RX queue */
-			while (pdTRUE == xQueueReceive(rx_queue, &rx_queue_item, 0))
-			{
-				bool do_recv = (rx_queue_item.rx_tx_buf != NULL);
-				uint32_t task_notification_value = 0;
-				if(rx_queue_item.timeout_s != 0)
-				{
-					FD_ZERO(&read_fd_set);
-					FD_SET(rx_queue_item.fd, &read_fd_set);
-					struct timeval tv =
-					{ .tv_sec = rx_queue_item.timeout_s, .tv_usec = 0 };
-					int result = sl_Select(FD_SETSIZE, &read_fd_set, NULL, NULL, &tv);
-					if (result > 0)
-					{
-						if (FD_ISSET(rx_queue_item.fd, &read_fd_set))
-						{
-							task_notification_value = rx_queue_item.task_notification_value;
-						}
-						else
-						{
-							task_notification_value = UINT32_MAX;
-							do_recv = false;
-						}
-					}
-				}
-				if(do_recv)
-				{
-					int ret = sl_Recv(rx_queue_item.fd, rx_queue_item.rx_tx_buf,
-															(_i16) rx_queue_item.rx_tx_buf_len, 0);
-				}
-				if(NULL != rx_queue_item.task_handle)
-				{
-					xTaskNotifyIndexed(rx_queue_item.task_handle, 1,
-									task_notification_value, eSetBits);
-				}
-			} // While select rx
-		}
-
-	} while (1);
-#endif
-}
-
-int wifi_service_recv(int sd, void *recv_buf, uint32_t recv_len, uint32_t timeout_ms)
-{
-	int ret_value = -1;
-	struct rx_queue_s rx_queue_item;
-	rx_queue_item.fd = sd;
-	rx_queue_item.task_handle = xTaskGetCurrentTaskHandle();
-	rx_queue_item.timeout_ms = timeout_ms;
-	rx_queue_item.rx_tx_buf = recv_buf;
-	rx_queue_item.rx_tx_buf_len = recv_len;
-
-	if (pdTRUE != xQueueSend(rx_queue, &rx_queue_item, portMAX_DELAY))
-	{
-		ret_value = -1;
-	}
-
-	return ret_value;
-}
-
-int enqueue_select_rx(enum wifi_socket_id_e id, int sd, uint32_t timeout_s)
-{
-	int ret_value = -1;
-
-	wifi_service_register_rx_socket(id, sd, timeout_s);
-
-	(void) xTaskNotifyIndexed(select_task_handle, 0, 1, eIncrement);
-
-	if(pdTRUE == xSemaphoreTake( rx_sockets[(size_t)id].signal_semaphore, 1000*(timeout_s) ))
-	{
-		ret_value = 0;
-	}
-
-	return ret_value;
-}
-
-int enqueue_select_tx(enum wifi_socket_id_e id, int sd, uint32_t timeout_s)
-{
-	int ret_value = -1;
-	(void)xSemaphoreTake( tx_sockets[(size_t)id].signal_semaphore, 0);
-
-	wifi_service_register_tx_socket(id, sd, timeout_s);
-
-	(void) xTaskNotifyIndexed(select_task_handle, 0, 1, eIncrement);
-
-	if(pdTRUE == xSemaphoreTake( tx_sockets[(size_t)id].signal_semaphore, 1000*(timeout_s) ))
-	{
-		ret_value = 0;
-	}
-
-	return ret_value;
-}
 
 void sntp_sync_timer_callback(TimerHandle_t pxTimer)
 {
@@ -440,8 +108,6 @@ void wifi_task(void *param)
 	volatile _i16 role = 0;
 
 	wifi_status.connection = wifi_disconnected;
-
-	initialize_socket_management();
 
 	role = sl_Start(NULL, (_i8*) CC3100_DEVICE_NAME, NULL);
 	switch ((SlWlanMode_e) role)
@@ -557,7 +223,7 @@ void wifi_task(void *param)
 
 				// Suspend LWM2M Task
 				vTaskSuspend(user_task_handle);
-				vTaskSuspend(select_task_handle);
+				vTaskSuspend(network_monitor_task_handle);
 				vTaskSuspend(get_mqtt_client_task_handle());
 				sl_iostream_printf(sl_iostream_swo_handle, "Wifi Disconnected %x\n\r",
 						ulNotifiedValue);
@@ -575,7 +241,7 @@ void wifi_task(void *param)
 
 			if (ulNotifiedValue & ((uint32_t) wifi_ip_v4_acquired | (uint32_t) wifi_ip_v6_acquired))
 			{
-				vTaskResume(select_task_handle);
+				vTaskResume(network_monitor_task_handle);
 			}
 
 			if (ulNotifiedValue & (uint32_t) wifi_ip_released)
@@ -623,7 +289,7 @@ void wifi_task(void *param)
 			{
 				// Resume LWM2M Task
 				vTaskResume(user_task_handle);
-				vTaskResume(get_mqtt_client_task_handle());
+				//vTaskResume(get_mqtt_client_task_handle());
 			}
 		} else
 		{
@@ -639,8 +305,7 @@ void create_wifi_service_task(void)
 	xTaskCreate(wifi_task, "WifiService", configMINIMAL_STACK_SIZE + 1024, NULL,
 	WIFI_TASK_PRIORITY, &wifi_task_handle);
 
-	xTaskCreate(select_task, "SelectTask", configMINIMAL_STACK_SIZE + 100, NULL,
-	SELECT_TASK_PRIORITY, &select_task_handle);
+
 
 	sntp_sync_timer = xTimerCreate("ntpService", 1000, pdTRUE, NULL, sntp_sync_timer_callback);
 }
@@ -750,6 +415,5 @@ void CC3100_NetAppEvtHdlr(SlNetAppEvent_t *pSlNetApp)
 	};
 
 	xTaskNotify(wifi_task_handle, ((uint32_t)wifi_status.ip | WIFI_PENDING_STATE), eSetBits);
-
 }
 

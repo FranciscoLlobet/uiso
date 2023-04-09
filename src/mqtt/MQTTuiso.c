@@ -117,21 +117,6 @@ static int uiso_mqtt_read(Network *n, unsigned char *buffer, int len, int timeou
 	int recvLen = 0;
 	uint32_t timeout_s = 1;
 	printf("rto: %d\n\r", timeout_ms);
-	if (timeout_ms > 1000)
-	{
-
-		if ((timeout_ms - (timeout_s * 1000)) > 450)
-		{
-			timeout_s = timeout_s + 1;
-		}
-	}
-
-	if(timeout_ms > 1000)
-	{
-		timeout_s = timeout_ms / 1000;
-
-		recvLen = enqueue_select_rx(wifi_service_mqtt_socket, n->my_socket, timeout_s);
-	}
 
 	if(0 == recvLen)
 	{
@@ -150,15 +135,6 @@ static int uiso_mqtt_read(Network *n, unsigned char *buffer, int len, int timeou
 static int uiso_mqtt_write(Network *n, unsigned char *buffer, int len, int timeout_ms)
 {
 	int rc = 0;
-//	uint32_t timeout_s = 1;
-
-//	printf("wto: %d\n\r", timeout_ms);
-//
-//	if (timeout_ms > 1000)
-//	{
-//		timeout_s = timeout_ms / 1000;
-//		rc = enqueue_select_tx(wifi_service_mqtt_socket, n->my_socket, timeout_s);
-//	}
 
 	if(0 == rc)
 	{

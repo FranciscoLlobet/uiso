@@ -1,13 +1,22 @@
 #include "uiso.h"
 
 #include "mqtt_client.h"
+#include "../wifi_service.h"
 /* Standard includes. */
 
 
 #include "MQTTClient.h"
 
 
+enum
+{
+	mqtt_notify_message_reception = (1 << 1),
+	mqtt_notify_sensor_timer = ( 1<< 2 )
+};
+
 static TaskHandle_t mqtt_client_task = NULL;
+
+TimerHandle_t publish_timer = NULL;
 
 TaskHandle_t get_mqtt_client_task_handle(void)
 {
@@ -47,11 +56,6 @@ static void prvMQTTEchoTask(void *pvParameters)
 	if ((rc = NetworkConnect(&network, address, 1883)) != 0)
 		printf("Return code from network connect is %d\n", rc);
 
-#if defined(MQTT_TASK)
-	if ((rc = MQTTStartTask(&client)) != pdPASS)
-		printf("Return code from start tasks is %d\n", rc);
-#endif
-
 	connectData.MQTTVersion = 3;
 	connectData.clientID.cstring = "LlobetianTecnologica";
 
@@ -63,8 +67,11 @@ static void prvMQTTEchoTask(void *pvParameters)
 	if ((rc = MQTTSubscribe(&client, "FreeRTOS/sample/#", 1, messageArrived)) != 0)
 		printf("Return code from MQTT subscribe is %d\n", rc);
 
+	xTimerStart( publish_timer, portMAX_DELAY);
+
 	do
 	{
+		int rc = 0;
 		MQTTMessage message;
 		char payload[30];
 
@@ -74,9 +81,28 @@ static void prvMQTTEchoTask(void *pvParameters)
 		sprintf(payload, "message number %d", count++);
 		message.payloadlen = strlen(payload);
 
-		if ((rc = MQTTPublish(&client, "FreeRTOS/sample/a", &message)) != 0)
-			printf("Return code from MQTT publish is %d\n", rc);
-		vTaskDelay(5000);
+		// wait for recieve
+
+
+		uint32_t notification_value = 0;
+		if(pdTRUE == xTaskNotifyWait(0, UINT32_MAX, &notification_value, 0))
+		{
+			if(notification_value & (uint32_t)mqtt_notify_message_reception)
+			{
+				(void)MQTTYield(&client, 500);
+			}
+			if(notification_value & (uint32_t)mqtt_notify_sensor_timer)
+			{
+				MQTTPublish(&client, "FreeRTOS/sample/a", &message);
+			}
+		}
+
+		if(0 == enqueue_select_rx(wifi_service_mqtt_socket, network.my_socket, 5))
+		{
+			(void)xTaskNotify(mqtt_client_task, (uint32_t)mqtt_notify_message_reception, eSetBits);
+		}
+
+
 	}
 	while(1);
 
@@ -89,6 +115,13 @@ static void prvMQTTEchoTask(void *pvParameters)
 
 #define MQTT_CLIENT_TASK_PRIORITY    (UBaseType_t)( uiso_task_runtime_services )
 
+void publish_timer_callback(TimerHandle_t xTimer)
+{
+	(void)xTimer;
+
+	(void)xTaskNotify(mqtt_client_task, (uint32_t)mqtt_notify_sensor_timer, eSetBits);
+}
+
 int initialize_mqtt_client(void)
 {
 	xTaskCreate(prvMQTTEchoTask,
@@ -97,6 +130,10 @@ int initialize_mqtt_client(void)
 			NULL,
 			MQTT_CLIENT_TASK_PRIORITY,
 			&mqtt_client_task);
+
+	publish_timer = xTimerCreate("MQTT publish timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, publish_timer_callback);
+
+
 
 	return 0;
 }

@@ -1,4 +1,5 @@
 # Implemented
+
 - FreeRTOS Runtime
 - LEDs (Red, Orange, Yellow)
 - Buttons 1 and 2 plus interrupts
@@ -10,14 +11,9 @@
 - Wifi Service
 - NTP service
 - Wakaama integration
-
-
-
-
-# Doing
-- MBedTLS
+- EmbedTLS
 - Sensors
-- I2C master driver
+- I2C Master
 
 
 

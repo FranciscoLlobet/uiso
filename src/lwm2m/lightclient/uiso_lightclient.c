@@ -567,7 +567,11 @@ int lwm2m_client_task_runner(void *param1)
 		}
 		else
 		{
-			lwm2m_timeout = 1000 * (uint32_t) timeout_val;
+			if(timeout_val > 10)
+			{
+				timeout_val = 1;
+			}
+
 			wait_for_rx(data.connection_context->fd, timeout_val);
 		}
 	} while (1);

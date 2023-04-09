@@ -188,6 +188,8 @@ int main(int argc, char *argv[])
 
 	create_wifi_service_task();
 
+	create_network_mediator();
+
 	create_sensor_task();
 
 	VStartSimpleLinkSpawnTask((unsigned portBASE_TYPE)uiso_task_connectivity_service);

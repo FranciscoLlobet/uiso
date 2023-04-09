@@ -57,5 +57,7 @@ int ThreadStart(Thread*, void (*fn)(void*), void* arg);
 
 void init_network(Network* n);
 
+int wait_for_message(void);
+
 
 #endif /* MQTT_MQTTUISO_H_ */
