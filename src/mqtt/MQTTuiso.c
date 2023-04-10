@@ -169,7 +169,7 @@ int NetworkConnect(Network *n, char *addr, int port)
 	int retVal;
 	unsigned long ipAddress;
 
-	sl_NetAppDnsGetHostByName(addr, strlen(addr), &ipAddress, AF_INET);
+	sl_NetAppDnsGetHostByName((_i8 * )addr, strlen(addr), &ipAddress, AF_INET);
 
 	sAddr.sin_family = AF_INET;
 	sAddr.sin_port = sl_Htons((unsigned short) port);

@@ -8,9 +8,8 @@
 #ifndef UISO_NET_SOCKETS_H_
 #define UISO_NET_SOCKETS_H_
 
-#include "uiso.h"
-#include "simplelink.h"
-#include "mbedtls/ssl.h"
+#include "network.h"
+
 #include "liblwm2m.h"
 
 #include "mbedtls/ctr_drbg.h"
@@ -21,23 +20,9 @@
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/entropy.h"
 
-#define UISO_PROTOCOL_BIT				(1 << 0)
-#define UISO_UDP_TCP_SELECTION_BIT		(1 << 1)
-#define UISO_IPV4_IPV6_SELECTION_BIT	(1 << 2)
-#define UISO_SECURITY_BIT				(1 << 3)
 
-enum uiso_protocol
-{
-	uiso_protocol_bit = (1 << 0),
-	uiso_udp_tcp_selection_bit = (1 << 1),
-	uiso_security_bit = (1 << 2),
 
-	uiso_protocol_no_protocol = 0,
-	uiso_protocol_udp_ip4 = (0 << 1)|(1 << 0),
-	uiso_protocol_tcp_ip4 = (1 << 1)|(1 << 0),
-	uiso_protocol_dtls_ip4 = uiso_security_bit | uiso_protocol_udp_ip4,
-	uiso_protocol_tls_ip4 = uiso_security_bit | uiso_protocol_tcp_ip4
-};
+
 
 enum
 {

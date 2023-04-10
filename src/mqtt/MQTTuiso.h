@@ -9,10 +9,10 @@
 #define MQTT_MQTTUISO_H_
 
 #include "uiso.h"
+//#include "network.h"
 
-#include "simplelink.h"
-#include "netapp.h"
-#include "socket.h"
+//#include "netapp.h"
+//#include "socket.h"
 
 #define MQTT_TASK    (1)
 

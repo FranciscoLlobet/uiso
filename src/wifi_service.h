@@ -10,19 +10,13 @@
 
 #include "uiso.h"
 
+#include "network.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timer.h"
 #include "semphr.h"
 
-enum wifi_socket_id_e
-{
-	wifi_service_ntp_socket = 0,
-	wifi_service_lwm2m_socket = 1,
-	wifi_service_mqtt_socket = 2,
-	wifi_service_http_socket = 3,
-	wifi_service_max
-};
 
 
 int enqueue_select_rx(enum wifi_socket_id_e id, int sd, uint32_t timeout_s);
@@ -31,7 +25,7 @@ int enqueue_select_tx(enum wifi_socket_id_e id, int sd, uint32_t timeout_s);
 void create_wifi_service_task(void);
 
 
-#define MONITOR_MAX_RESPONSE_S    1
+#define MONITOR_MAX_RESPONSE_S    2
 extern TaskHandle_t network_monitor_task_handle;
 int create_network_mediator(void);
 

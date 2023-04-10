@@ -305,8 +305,6 @@ void create_wifi_service_task(void)
 	xTaskCreate(wifi_task, "WifiService", configMINIMAL_STACK_SIZE + 1024, NULL,
 	WIFI_TASK_PRIORITY, &wifi_task_handle);
 
-
-
 	sntp_sync_timer = xTimerCreate("ntpService", 1000, pdTRUE, NULL, sntp_sync_timer_callback);
 }
 

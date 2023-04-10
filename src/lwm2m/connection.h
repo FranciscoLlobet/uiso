@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include "simplelink.h"
+#include "network.h"
 #include <sys/stat.h>
 #include <liblwm2m.h>
 
