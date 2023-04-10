@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
