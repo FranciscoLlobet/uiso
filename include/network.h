@@ -99,7 +99,12 @@ enum uiso_network_ret
 
 #define UISO_NETWORK_INVALID_SOCKET		((int32_t)-1)
 
-
+/**
+ * Get Network Context for Service ID
+ * @param id
+ * @return
+ */
+uiso_network_ctx_t uiso_get_network_ctx(enum wifi_socket_id_e id);
 
 /**
  * Create Connection and Handshake with peer
@@ -113,7 +118,7 @@ int uiso_create_network_connection(uiso_network_ctx_t ctx, const char *host,
 		const char *port, enum uiso_protocol proto);
 
 /**
- *
+ * Register SSL context with network context
  * @param ctx
  * @param ssl_ctx
  * @return
