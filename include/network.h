@@ -83,6 +83,7 @@ enum uiso_network_ret
 	UISO_NETWORK_OK = 0,
 	UISO_NETWORK_GENERIC_ERROR = INT32_MIN,
 	UISO_NETWORK_SOCKET_ERROR ,
+	UISO_NETWORK_BIND_ERROR,
 	UISO_NETWORK_CONNECT_ERROR,
 	UISO_NETWORK_DNS_ERROR,
 
@@ -115,7 +116,9 @@ uiso_network_ctx_t uiso_get_network_ctx(enum wifi_socket_id_e id);
  * @return
  */
 int uiso_create_network_connection(uiso_network_ctx_t ctx, const char *host,
-		const char *port, enum uiso_protocol proto);
+		const char *port, const char * local_port, enum uiso_protocol proto);
+
+int uiso_close_network_connection(uiso_network_ctx_t ctx);
 
 /**
  * Register SSL context with network context
@@ -125,7 +128,8 @@ int uiso_create_network_connection(uiso_network_ctx_t ctx, const char *host,
  */
 int uiso_network_register_ssl_context(uiso_network_ctx_t ctx, mbedtls_ssl_context * ssl_ctx);
 
-int uiso_network_send_udp(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length);
+int uiso_network_read(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length);
+int uiso_network_send(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length);
 
-
+mbedtls_ssl_context * uiso_network_get_ssl_ctx(uiso_network_ctx_t ctx);
 #endif /* NETWORK_H_ */

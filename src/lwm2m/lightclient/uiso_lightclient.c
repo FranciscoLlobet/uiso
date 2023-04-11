@@ -119,7 +119,6 @@ typedef struct
 {
 	lwm2m_object_t *securityObjP;
 	connection_t connList;
-	connection_t connection_context;
 } client_data_t;
 
 extern int mbedtls_connector_initialize(lwm2m_object_t *securityObjP,
@@ -191,7 +190,7 @@ void* lwm2m_connect_server(uint16_t secObjInstID, void *userData)
 		fprintf(stderr, "Connection creation failed.\r\n");
 		(void) mbedtls_cleanup();
 	}
-	else
+	else if(NULL == dataP->connList)
 	{
 		dataP->connList = newConnP;
 	}
@@ -207,6 +206,8 @@ void lwm2m_close_connection(void *sessionH, void *userData)
 
 	app_data = (client_data_t*) userData;
 	targetP = (connection_t) sessionH;
+
+	// Add stuff to close the connection
 
 	mbedtls_connector_close();
 
@@ -355,8 +356,8 @@ void print_state(lwm2m_context_t *lwm2mH)
 
 #define COMPLETE_SERVER_URI    "coap://leshan.eclipseprojects.io:5683"
 
-lwm2m_context_t *lwm2mH = NULL;
-lwm2m_object_t *objArray[OBJ_COUNT];
+//lwm2m_context_t *lwm2mH = NULL;
+//lwm2m_object_t *objArray[OBJ_COUNT];
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -364,8 +365,6 @@ lwm2m_object_t *objArray[OBJ_COUNT];
 extern TaskHandle_t user_task_handle;
 
 client_data_t data;
-
-extern uiso_mbedtls_context_t net_context;
 
 int lwm2m_client_task_runner(void *param1)
 {
@@ -385,10 +384,8 @@ int lwm2m_client_task_runner(void *param1)
 
 	/* Reset the client_data_object */
 	memset(&data, 0, sizeof(client_data_t));
-	data.connection_context = (connection_t) &net_context;
-	data.connection_context->next = NULL;
+
 	data.connList = (connection_t) NULL;
-	data.connList->next = NULL;
 
 	/*
 	 * Now the main function fill an array with each object, this list will be later passed to liblwm2m.
@@ -491,19 +488,9 @@ int lwm2m_client_task_runner(void *param1)
 			}
 			if (notification_value & (uint32_t) lwm2m_notify_message_reception)
 			{
-
 				/* Handle reception */
-				ssize_t numBytes = -1;
-				do
-				{
-					numBytes = mbedtls_ssl_read(
-							data.connection_context->ssl_context,
-							get_rx_buffer(),
-							MAX_PACKET_SIZE);
-				} while ((numBytes == MBEDTLS_ERR_SSL_WANT_WRITE)
-						|| (numBytes == MBEDTLS_ERR_SSL_ASYNC_IN_PROGRESS)
-						|| (numBytes == MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS)
-						|| (numBytes == MBEDTLS_ERR_SSL_CLIENT_RECONNECT));
+				ssize_t numBytes = uiso_network_read(data.connList->ctx, get_rx_buffer(),
+						MAX_PACKET_SIZE);
 
 				if (numBytes >= MAX_PACKET_SIZE)
 				{
@@ -512,39 +499,11 @@ int lwm2m_client_task_runner(void *param1)
 				}
 				else if (numBytes >= 0)
 				{
-					connection_t connP = data.connection_context;
+					connection_t connP = data.connList;
 
 					/* Let liblwm2m respond to the query depending on the context */
 					lwm2m_handle_packet(lwm2mH, get_rx_buffer(),
 							(size_t) numBytes, connP);
-				}
-				else
-				{
-					/* Close DTLS session and perform handshake */
-					do
-					{
-						result = mbedtls_ssl_close_notify(
-								data.connection_context->ssl_context);
-					} while ((MBEDTLS_ERR_SSL_WANT_READ == result)
-							|| (MBEDTLS_ERR_SSL_WANT_WRITE == result));
-
-					result = mbedtls_ssl_session_reset(
-							data.connection_context->ssl_context);
-
-					if (0 == result)
-					{
-						do
-						{
-							result = mbedtls_ssl_handshake(
-									data.connection_context->ssl_context);
-						} while ((MBEDTLS_ERR_SSL_WANT_READ == result)
-								|| (MBEDTLS_ERR_SSL_WANT_WRITE == result));
-					}
-
-					if (0 != result)
-					{
-						// TLS Connection did not work
-					}
 				}
 			}
 		}
@@ -572,7 +531,7 @@ int lwm2m_client_task_runner(void *param1)
 				timeout_val = 1;
 			}
 
-			wait_for_rx(data.connection_context->fd, timeout_val);
+			wait_for_rx(0, timeout_val);
 		}
 	} while (1);
 

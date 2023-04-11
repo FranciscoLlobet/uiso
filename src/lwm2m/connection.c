@@ -30,6 +30,7 @@
 extern mbedtls_ssl_context ssl_context;
 extern uiso_mbedtls_context_t net_context;
 
+#if 0
 connection_t connection_find(connection_t connList, struct sockaddr_in *addr,
 		size_t addrLen)
 {
@@ -66,214 +67,76 @@ connection_t connection_new_incoming(connection_t connList,
 
 	return connP;
 }
+#endif
 
 connection_t connection_create(connection_t connList, char *host, char *port,
 		int protocol)
 {
-	(void) connList;
 	int ret = UISO_NET_GENERIC_ERROR;
-
-	connection_t connP = NULL;
-
-	ret = uiso_mbedtls_net_connect(&net_context, host, port, protocol);
-
-	if (UISO_NET_OK == ret)
+	connection_t newConn = lwm2m_malloc(sizeof(struct connection_s));
+	if(NULL != newConn)
 	{
-		if (uiso_protocol_dtls_ip4 == protocol)
+		ret = uiso_create_network_connection(uiso_get_network_ctx(wifi_service_lwm2m_socket), host, port, NULL, (enum uiso_protocol)protocol);
+		if(ret >= 0)
 		{
-			mbedtls_ssl_set_bio(net_context.ssl_context, &net_context,
-					mbedtls_net_send, mbedtls_net_recv, NULL);
-			mbedtls_ssl_set_mtu(net_context.ssl_context,
-					SIMPLE_LINK_MAX_SEND_MTU); /* Set MTU to match simple-link */
+			/* Prepare */
+			newConn->ctx = uiso_get_network_ctx(wifi_service_lwm2m_socket);
+			newConn->next = NULL;
 
-			do
+			if(NULL != connList)
 			{
-				ret = mbedtls_ssl_handshake(net_context.ssl_context);
-			} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-					|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+				connection_t connList_traversal = connList;
+				while(connList_traversal->next != NULL)
+				{
+					connList_traversal = connList_traversal->next;
+				}
+				connList_traversal->next = newConn;
+			}
+		}
+		else
+		{
+			lwm2m_free(newConn);
+			newConn = NULL;
 		}
 	}
 
-	if (UISO_NET_OK == ret)
-	{
-		//connP = connection_new_incoming(connList, &net_context);
-		net_context.next = NULL;
-		connP = &net_context;
-		net_context.last_send_time = lwm2m_gettime();
-	}
-
-	return connP;
+	return newConn;
 }
 
 void connection_free(connection_t connList)
 {
-	int ret = UISO_NET_GENERIC_ERROR;
-
-	do
+	int ret = UISO_NETWORK_OK;
+	if(connList != NULL)
 	{
-		ret = mbedtls_ssl_close_notify(net_context.ssl_context);
-	} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-			|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+		do{
+			// connection free
+			ret = uiso_close_network_connection(connList->ctx);
+			if(ret != UISO_NETWORK_OK)
+			{
+				printf("Error: %d\n\r");
+			}
 
-	mbedtls_net_close(&net_context);
+			if(NULL != connList->next)
+			{
+				connList = connList->next;
+			}
+		}
+		while(NULL != connList->next);
+	}
 }
 
 int connection_send(connection_t connP, uint8_t *buffer, size_t length)
 {
-	int nbSent;
-	size_t offset;
+	(void)connP;
 
-	offset = 0;
-	time_t current_time = lwm2m_gettime();
-
-	/* Re-negotiation after a certain timeout */
-	if (connP->protocol == uiso_protocol_dtls_ip4)
+	int nbSent = uiso_network_send(uiso_get_network_ctx(wifi_service_lwm2m_socket), buffer, length);
+	if(0 > nbSent)
 	{
-		int ret = -1;
-		int enabled = MBEDTLS_SSL_CID_DISABLED;
-
-		/* Check if CID is available from peer */
-		ret = mbedtls_ssl_get_peer_cid(&ssl_context, &enabled, NULL, 0);
-		if (MBEDTLS_SSL_CID_DISABLED == enabled)
-		{
-			if ((current_time - connP->last_send_time) > 120)
-			{
-				/* Attempt re-negotiation */
-				do
-				{
-					ret = mbedtls_ssl_renegotiate(&ssl_context);
-				} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-						|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret)
-						|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == ret));
-
-				if (0 != ret)
-				{
-					/* This code tries to handle issues seen when the server does not support renegociation */
-					ret = mbedtls_ssl_close_notify(&ssl_context);
-					if (0 == ret)
-					{
-						ret = mbedtls_ssl_session_reset(&ssl_context);
-					}
-					else
-					{
-						(void) mbedtls_ssl_session_reset(&ssl_context);
-					}
-
-					if (0 == ret)
-					{
-						do
-						{
-							ret = mbedtls_ssl_handshake(
-									net_context.ssl_context);
-						} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-								|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
-					}
-				}
-
-				if (0 != ret)
-				{
-					printf("Error: %d", ret);
-					return -1;
-				}
-			}
-		}
+		return -1;
 	}
-
-	while (offset != length)
-	{
-		if (connP->protocol == uiso_protocol_dtls_ip4)
-		{
-			nbSent = mbedtls_ssl_write(&ssl_context, buffer + offset,
-					length - offset);
-			if ((MBEDTLS_ERR_SSL_WANT_READ == nbSent)
-					|| (MBEDTLS_ERR_SSL_WANT_WRITE == nbSent)
-					|| (MBEDTLS_ERR_SSL_ASYNC_IN_PROGRESS == nbSent)
-					|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == nbSent))
-			{
-				nbSent = 0;
-			}
-			else if (0 > nbSent)
-			{
-#if 1
-				int ret = -1;
-				do
-				{
-					ret = mbedtls_ssl_close_notify(&ssl_context);
-				} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-						|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
-
-				ret = mbedtls_ssl_session_reset(&ssl_context);
-				if (0 == ret)
-				{
-					do
-					{
-						ret = mbedtls_ssl_handshake(net_context.ssl_context);
-					} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-							|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
-				}
-				if (0 == ret)
-				{
-					nbSent = 0;
-				}
-#endif
-			}
-		}
-		else if (connP->protocol == uiso_protocol_udp_ip4)
-		{
-			nbSent = sendto(connP->fd, buffer + offset, length - offset, 0,
-					(struct sockaddr*) &(connP->host_addr),
-					connP->host_addr_len);
-		}
-		else
-		{
-			nbSent = -1; /* Unsupported protocol */
-		}
-
-		if (nbSent < 0)
-			return -1;
-		offset += nbSent;
-	}
-
-	connP->last_send_time = current_time;
-	return 0;
+	return nbSent;
 }
 
-int connection_renegociate(connection_t connP)
-{
-	int ret = -1;
-
-	/* Attempt re-negotiation */
-	do
-	{
-		ret = mbedtls_ssl_renegotiate(&ssl_context);
-	} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-			|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret)
-			|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == ret));
-
-	if (0 != ret)
-	{
-		/* This code tries to handle issues seen when the server does not support renegociation */
-		do
-		{
-			ret = mbedtls_ssl_close_notify(&ssl_context);
-		} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-				|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
-
-		ret = mbedtls_ssl_session_reset(&ssl_context);
-
-		if (0 == ret)
-		{
-			do
-			{
-				ret = mbedtls_ssl_handshake(net_context.ssl_context);
-			} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-					|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
-		}
-
-	}
-
-	return ret;
-}
 
 uint8_t lwm2m_buffer_send(void *sessionH, uint8_t *buffer, size_t length,
 		void *userdata)

@@ -9,7 +9,16 @@
 #include "lwm2m_security.h"
 #include "../connection.h"
 
-#include "uiso_net_sockets.h"
+#include "network.h"
+
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/timing.h"
+
+#include "mbedtls/aes.h"
+#include "mbedtls/base64.h"
+#include "mbedtls/net_sockets.h"
+#include "mbedtls/entropy.h"
+
 
 /* Certificate ciphersuites */
 static const int ciphersuites_pk[] =
@@ -30,9 +39,6 @@ static const uint16_t sig_algorithms[] =
 
 static const uint16_t groups[] =
 { MBEDTLS_SSL_IANA_TLS_GROUP_SECP256R1, MBEDTLS_SSL_IANA_TLS_GROUP_NONE };
-
-/* Net context for the LWM2M client */
-uiso_mbedtls_context_t net_context;
 
 /* SSL Timer for the LWM2M connection */
 uiso_mbedtls_timing_delay_t ssl_timer;
@@ -119,8 +125,6 @@ int mbedtls_connector_initialize(lwm2m_object_t * securityObjP, uint16_t secObjI
 	/* Start with mbedtls init */
 	enum lwm2m_security_mode_e security_mode = get_security_mode(securityObjP, secObjInstID);
 
-
-	uiso_mbedtls_net_init(&net_context);
 	uiso_mbedtls_init_timer(&ssl_timer);
 	UISO_MBED_TLS_THREADING_SET_ALT();
 
@@ -248,11 +252,7 @@ int mbedtls_connector_initialize(lwm2m_object_t * securityObjP, uint16_t secObjI
 
 	if(0 == ret)
 	{
-		net_context.ssl_context = &ssl_context;
-	}
-	else
-	{
-		net_context.ssl_context = NULL;
+		ret = uiso_network_register_ssl_context(uiso_get_network_ctx(wifi_service_lwm2m_socket), &ssl_context);
 	}
 
 	return ret;

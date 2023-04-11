@@ -18,10 +18,18 @@
 
 #define SIMPLELINK_MAX_SEND_MTU 	1472
 
+typedef int (*_network_send_fn)(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+typedef int (*_network_read_fn)(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+typedef int (*_network_close_fn)(uiso_network_ctx_t ctx);
+
 struct uiso_sockets_s
 {
 	int32_t sd; /* Socket Descriptor */
 	int32_t protocol;
+
+	_network_send_fn send_fn;
+	_network_read_fn read_fn;
+	_network_close_fn close_fn;
 
 	/* Wait deadlines */
 	uint32_t rx_wait_deadline_s;
@@ -65,6 +73,19 @@ TaskHandle_t network_monitor_task_handle = NULL;
 static int _network_send(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
 static int _network_recv(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
 static int _network_close(uiso_network_ctx_t ctx);
+
+static int _send_udp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+static int _send_tcp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+
+static int _read_dtls(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length);
+static int _send_dtls(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length);
+
+/* mbedTLS BIO */
+static int _send_bio_tcp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+static int _send_bio_udp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+static int _recv_bio_tcp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+static int _recv_bio_udp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len);
+
 static int _set_mbedtls_bio(uiso_network_ctx_t ctx);
 
 static inline uiso_network_ctx_t _get_network_ctx(enum wifi_socket_id_e id);
@@ -85,7 +106,6 @@ void wifi_service_register_rx_socket(enum wifi_socket_id_e id, int sd, uint32_t 
 
 	uiso_network_ctx_t ctx = _get_network_ctx(id);
 
-	ctx->sd = sd;
 	ctx->rx_wait_deadline_s = (uint32_t) sl_sleeptimer_get_time() + timeout_s;
 
 	(void) xSemaphoreGive(network_monitor_mutex);
@@ -98,7 +118,7 @@ void wifi_service_register_tx_socket(enum wifi_socket_id_e id, int sd, uint32_t 
 
 	uiso_network_ctx_t ctx = _get_network_ctx(id);
 
-	ctx->sd = sd;
+	//ctx->sd = sd;
 	ctx->tx_wait_deadline_s = (uint32_t) sl_sleeptimer_get_time() + timeout_s;
 
 	(void) xSemaphoreGive(network_monitor_mutex);
@@ -302,7 +322,7 @@ static void select_task(void *param)
 }
 
 /* Basic network operations */
-static int _network_connect(uiso_network_ctx_t ctx, const char *host, const char *port,
+static int _network_connect(uiso_network_ctx_t ctx, const char *host, const char *port, const char * local_port,
 		enum uiso_protocol proto)
 {
 	int ret = (int) UISO_NETWORK_GENERIC_ERROR;
@@ -374,8 +394,20 @@ static int _network_connect(uiso_network_ctx_t ctx, const char *host, const char
 	}
 
 	// Bind to local port
-	//
-	//
+	if(ret == (int)UISO_NETWORK_OK)
+	{
+		if(NULL != local_port)
+		{
+			ctx->local.sin_family = SL_AF_INET;
+			ctx->local.sin_port = __REV16(atoi(local_port));
+			ctx->local.sin_addr.s_addr = (uint32_t)(0);
+			ctx->local_len = sizeof(struct SlSockAddrIn_t);
+			if(0 != sl_Bind(ctx->sd, (SlSockAddr_t *)&ctx->local, (_i16)ctx->local_len))
+			{
+				ret = (int) UISO_NETWORK_BIND_ERROR;
+			}
+		}
+	}
 
 	if (ret == (int) UISO_NETWORK_OK)
 	{
@@ -390,72 +422,73 @@ static int _network_connect(uiso_network_ctx_t ctx, const char *host, const char
 	return ret;
 }
 
-/* support function for mbedTLS */
-static int _network_recv(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
+static int _send_bio_udp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
 {
-	int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
-
-	if (NULL == ctx)
-	{
-		return UISO_NETWORK_NULL_CTX;
-	} else if (0 >= (ctx->sd))
-	{
-		return UISO_NETWORK_NEGATIVE_SD;
-	}
-
-	if (ctx->protocol & (int32_t) uiso_protocol_udp_ip4)
-	{
-		ctx->peer_len = sizeof(SlSockAddrIn_t);
-		ret = (int) sl_RecvFrom((_i16) ctx->sd, (void*) buf, (_i16) len, (_i16) 0,
-				(SlSockAddr_t*) &(ctx->peer), (SlSocklen_t*) &(ctx->peer_len));
-	} else if (ctx->protocol & (int32_t) uiso_protocol_tcp_ip4)
-	{
-		ret = (int) sl_Recv((_i16) ctx->sd, (char*) buf, (_i16) len, (_i16) 0);
-	} else
-	{
-		ret = (int) UISO_NETWORK_UNKNOWN_PROTOCOL;
-	}
-
-	if (ret < 0)
-	{
-		if (ret == (int) SL_EAGAIN)
-		{
-			ret = (int) MBEDTLS_ERR_SSL_WANT_READ;
-		} else
-		{
-			ret = UISO_NETWORK_RECV_ERROR;
-		}
-	}
-
-	return (ret);
+	return (int) sl_SendTo((_i16) ctx->sd, (void*) buf, (_i16) len, (_i16) 0,
+			(SlSockAddr_t*) &(ctx->peer), sizeof(SlSockAddrIn_t));
 }
 
-/* support function for mbedTLS */
-static int _network_send(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
+static int _send_bio_tcp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
 {
-	int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
+	return (int) sl_Send((_i16) ctx->sd, (void*) buf, (_i16) len, (_i16) 0);
+}
 
-	if (NULL == ctx)
+static int _recv_bio_udp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
+{
+	ctx->peer_len = sizeof(SlSockAddrIn_t);
+	int ret = (int) sl_RecvFrom((_i16) ctx->sd, (void*) buf, (_i16) len, (_i16) 0,
+			(SlSockAddr_t*) &(ctx->peer), (SlSocklen_t*) &(ctx->peer_len));
+	if (ret == (int) SL_EAGAIN)
 	{
-		return UISO_NETWORK_NULL_CTX;
-	} else if (0 >= (ctx->sd))
-	{
-		return UISO_NETWORK_NEGATIVE_SD;
+		ret = (int) MBEDTLS_ERR_SSL_WANT_READ;
 	}
-
-	if (ctx->protocol & (int32_t) uiso_protocol_udp_ip4)
-	{
-		ret = (int) sl_SendTo((_i16) ctx->sd, (void*) buf, (_i16) len, (_i16) 0,
-				(SlSockAddr_t*) &(ctx->peer), sizeof(SlSockAddrIn_t));
-	} else if (ctx->protocol & (int32_t) uiso_protocol_tcp_ip4)
-	{
-		ret = (int) sl_Send((_i16) ctx->sd, (void*) buf, (_i16) len, (_i16) 0);
-	} else
-	{
-		ret = (int) UISO_NETWORK_UNKNOWN_PROTOCOL;
-	}
-
 	return ret;
+}
+
+static int _recv_bio_tcp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
+{
+	int ret = (int) sl_Recv((_i16) ctx->sd, (char*) buf, (_i16) len, (_i16) 0);
+	if (ret == (int) SL_EAGAIN)
+	{
+		ret = (int) MBEDTLS_ERR_SSL_WANT_READ;
+	}
+	return ret;
+}
+
+static int _send_udp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
+{
+	size_t offset = 0;
+	int n_bytes_sent = 0;
+
+	while (offset != len)
+	{
+		n_bytes_sent = _send_bio_udp(ctx, buf + offset, len - offset);
+		if (0 >= n_bytes_sent)
+		{
+			return n_bytes_sent;
+		}
+		offset += n_bytes_sent;
+	}
+
+	return offset;
+}
+
+static int _send_tcp(uiso_network_ctx_t ctx, unsigned char *buf, size_t len)
+{
+	size_t offset = 0;
+	int n_bytes_sent = 0;
+
+	while (offset != len)
+	{
+		n_bytes_sent = _send_bio_tcp(ctx, buf + offset, len - offset);
+		if (0 >= n_bytes_sent)
+		{
+			return n_bytes_sent;
+		}
+		offset += n_bytes_sent;
+	}
+
+	return offset;
 }
 
 static int _set_mbedtls_bio(uiso_network_ctx_t ctx)
@@ -468,11 +501,17 @@ static int _set_mbedtls_bio(uiso_network_ctx_t ctx)
 		return (int) UISO_NETWORK_NULL_CTX;
 	}
 
-	mbedtls_ssl_set_bio(ctx->ssl_context, (void*) ctx, (mbedtls_ssl_send_t*) _network_send,
-			(mbedtls_ssl_recv_t*) _network_recv, (mbedtls_ssl_recv_timeout_t*) NULL);
+	if (ctx->protocol == (int32_t) uiso_protocol_dtls_ip4)
+	{
+		mbedtls_ssl_set_bio(ctx->ssl_context, (void*) ctx, (mbedtls_ssl_send_t*) _send_bio_udp,
+				(mbedtls_ssl_recv_t*) _recv_bio_udp, (mbedtls_ssl_recv_timeout_t*) NULL);
+	} else if (ctx->protocol == (int32_t) uiso_protocol_tls_ip4)
+	{
+		mbedtls_ssl_set_bio(ctx->ssl_context, (void*) ctx, (mbedtls_ssl_send_t*) _send_bio_tcp,
+				(mbedtls_ssl_recv_t*) _recv_bio_tcp, (mbedtls_ssl_recv_timeout_t*) NULL);
+	}
 
-	mbedtls_ssl_set_mtu(ctx->ssl_context,
-	SIMPLELINK_MAX_SEND_MTU); /* Set MTU to match simple-link */
+	mbedtls_ssl_set_mtu(ctx->ssl_context, SIMPLELINK_MAX_SEND_MTU);
 
 	return UISO_NETWORK_OK;
 }
@@ -511,7 +550,7 @@ int uiso_network_register_ssl_context(uiso_network_ctx_t ctx, mbedtls_ssl_contex
 	return UISO_NETWORK_OK;
 }
 
-int uiso_create_network_connection(uiso_network_ctx_t ctx, const char *host, const char *port,
+int uiso_create_network_connection(uiso_network_ctx_t ctx, const char *host, const char *port, const char * local_port,
 		enum uiso_protocol proto)
 {
 	// GET NETWORK MUTEX
@@ -523,9 +562,35 @@ int uiso_create_network_connection(uiso_network_ctx_t ctx, const char *host, con
 		ret = _set_mbedtls_bio(ctx);
 	}
 
+	switch (proto)
+	{
+		case uiso_protocol_udp_ip4:
+			ctx->read_fn = _recv_bio_udp;
+			ctx->send_fn = _send_udp;
+			ctx->close_fn = _network_close;
+			break;
+		case uiso_protocol_tcp_ip4:
+			ctx->read_fn = _recv_bio_tcp;
+			ctx->send_fn = _send_tcp;
+			ctx->close_fn = _network_close;
+			break;
+		case uiso_protocol_dtls_ip4:
+			ctx->read_fn = _read_dtls;
+			ctx->send_fn = _send_dtls;
+			ctx->close_fn = NULL;
+			break;
+		case uiso_protocol_tls_ip4:
+			ctx->read_fn = _read_dtls;
+			ctx->send_fn = _send_dtls;
+			ctx->close_fn = NULL;
+			break;
+		default:
+			break;
+	}
+
 	if (ret >= 0)
 	{
-		ret = _network_connect(ctx, host, port, proto);
+		ret = _network_connect(ctx, host, port, local_port, proto);
 	}
 
 	if (ret >= 0)
@@ -550,16 +615,84 @@ int uiso_create_network_connection(uiso_network_ctx_t ctx, const char *host, con
 	return ret;
 }
 
-int uiso_network_send_udp(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length)
+int uiso_close_network_connection(uiso_network_ctx_t ctx)
 {
-	// GET NETWORK MUTEX
+	int ret = UISO_NETWORK_OK;
+
+	if (ctx->protocol & UISO_SECURITY_BIT_MASK)
+	{
+		do
+		{
+			ret = mbedtls_ssl_close_notify(ctx->ssl_context);
+		} while ((MBEDTLS_ERR_SSL_WANT_READ == ret) || (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+	}
+
+	if (ret == UISO_NETWORK_OK)
+	{
+		ret = _network_close(ctx);
+	} else
+	{
+		(void) _network_close(ctx);
+	}
+
+	return ret;
+}
+
+static int _read_dtls(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length)
+{
+	int numBytes = -1;
+	int result = 0;
+
+	do
+	{
+		numBytes = mbedtls_ssl_read(ctx->ssl_context, buffer, length);
+	} while ((numBytes == MBEDTLS_ERR_SSL_WANT_WRITE)
+			|| (numBytes == MBEDTLS_ERR_SSL_ASYNC_IN_PROGRESS)
+			|| (numBytes == MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS)
+			|| (numBytes == MBEDTLS_ERR_SSL_CLIENT_RECONNECT));
+
+	if (0 > numBytes)
+	{
+		/* Close DTLS session and perform handshake */
+		do
+		{
+			result = mbedtls_ssl_close_notify(ctx->ssl_context);
+		} while ((MBEDTLS_ERR_SSL_WANT_READ == result) || (MBEDTLS_ERR_SSL_WANT_WRITE == result));
+
+		result = mbedtls_ssl_session_reset(ctx->ssl_context);
+
+		if (0 == result)
+		{
+			do
+			{
+				result = mbedtls_ssl_handshake(ctx->ssl_context);
+			} while ((MBEDTLS_ERR_SSL_WANT_READ == result) || (MBEDTLS_ERR_SSL_WANT_WRITE == result));
+		}
+	}
+
+	return numBytes;
+}
+
+
+int uiso_network_read(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length)
+{
+	return ctx->read_fn(ctx, buffer, length);
+}
+
+int uiso_network_send(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length)
+{
+	return ctx->send_fn(ctx, buffer, length);
+}
+
+int _send_dtls(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length)
+{
 	int n_bytes_sent = 0;
 	int ret = (int) UISO_NETWORK_OK;
 	size_t offset = 0;
 
 	uint32_t current_time = sl_sleeptimer_get_time();
-	int cid_enabled = MBEDTLS_SSL_CID_DISABLED;
 
+	int cid_enabled = MBEDTLS_SSL_CID_DISABLED;
 	ret = mbedtls_ssl_get_peer_cid(ctx->ssl_context, &cid_enabled, NULL, 0);
 	if (MBEDTLS_SSL_CID_DISABLED == cid_enabled)
 	{
@@ -607,69 +740,48 @@ int uiso_network_send_udp(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length
 	/* Actual sending */
 	if (0 == ret)
 	{
-		if (ctx->protocol == uiso_protocol_dtls_ip4)
+		while (offset != length)
 		{
-			while (offset != length)
+			n_bytes_sent = mbedtls_ssl_write(ctx->ssl_context, buffer + offset, length - offset);
+			if ((MBEDTLS_ERR_SSL_WANT_READ == n_bytes_sent)
+					|| (MBEDTLS_ERR_SSL_WANT_WRITE == n_bytes_sent)
+					|| (MBEDTLS_ERR_SSL_ASYNC_IN_PROGRESS == n_bytes_sent)
+					|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == n_bytes_sent))
 			{
-				n_bytes_sent = mbedtls_ssl_write(ctx->ssl_context, buffer + offset,
-						length - offset);
-				if ((MBEDTLS_ERR_SSL_WANT_READ == n_bytes_sent)
-						|| (MBEDTLS_ERR_SSL_WANT_WRITE == n_bytes_sent)
-						|| (MBEDTLS_ERR_SSL_ASYNC_IN_PROGRESS == n_bytes_sent)
-						|| (MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS == n_bytes_sent))
+				/* These mbedTLS return codes mean that the write operation must be retried */
+				n_bytes_sent = 0;
+			} else if (0 > n_bytes_sent)
+			{
+				ret = UISO_NETWORK_GENERIC_ERROR;
+				do
 				{
-					/* These mbedTLS return codes mean that the write operation must be retried */
-					n_bytes_sent = 0;
-				} else if (0 > n_bytes_sent)
+					ret = mbedtls_ssl_close_notify(ctx->ssl_context);
+				} while ((MBEDTLS_ERR_SSL_WANT_READ == ret) || (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
+
+				ret = mbedtls_ssl_session_reset(ctx->ssl_context);
+				if (0 == ret)
 				{
-					ret = UISO_NETWORK_GENERIC_ERROR;
 					do
 					{
-						ret = mbedtls_ssl_close_notify(ctx->ssl_context);
+						ret = mbedtls_ssl_handshake(ctx->ssl_context);
 					} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
 							|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
-
-					ret = mbedtls_ssl_session_reset(ctx->ssl_context);
-					if (0 == ret)
-					{
-						do
-						{
-							ret = mbedtls_ssl_handshake(ctx->ssl_context);
-						} while ((MBEDTLS_ERR_SSL_WANT_READ == ret)
-								|| (MBEDTLS_ERR_SSL_WANT_WRITE == ret));
-					}
-
-					if (0 == ret)
-					{
-						n_bytes_sent = 0;
-					} else
-					{
-						break;
-					}
 				}
-				offset += n_bytes_sent;
-			}
 
-			if(0 == ret)
-			{
-				ret = offset;
-			}
-		} else if (ctx->protocol == uiso_protocol_udp_ip4)
-		{
-
-			while (offset != length)
-			{
-				n_bytes_sent = _network_send(ctx, buffer + offset, length - offset);
-				if (0 >= n_bytes_sent)
+				if (0 == ret)
+				{
+					n_bytes_sent = 0;
+				} else
 				{
 					break;
 				}
-				offset += n_bytes_sent;
 			}
-			ret = offset;
-		} else
+			offset += n_bytes_sent;
+		}
+
+		if (0 == ret)
 		{
-			n_bytes_sent = (int) UISO_NETWORK_GENERIC_ERROR; // error protocol
+			ret = offset;
 		}
 	}
 
@@ -677,8 +789,6 @@ int uiso_network_send_udp(uiso_network_ctx_t ctx, uint8_t *buffer, size_t length
 	{
 		ctx->last_send_time = sl_sleeptimer_get_time();
 	}
-
-	// RETURN NETWORK MUTEX
 	return ret;
 }
 
@@ -719,3 +829,7 @@ static int _initialize_network_ctx(uiso_network_ctx_t ctx)
 	return 0;
 }
 
+mbedtls_ssl_context* uiso_network_get_ssl_ctx(uiso_network_ctx_t ctx)
+{
+	return ctx->ssl_context;
+}

@@ -31,20 +31,24 @@
 #define LWM2M_BSSERVER_PORT_STR "5685"
 #define LWM2M_BSSERVER_PORT      5685
 
+typedef struct connection_s *connection_t;
 
-typedef struct uiso_mbedtls_context_s * connection_t;
+struct connection_s
+{
+		connection_t next;
+		uiso_network_ctx_t ctx;
+};
 
-int create_socket(const char * portStr, int ai_family);
+int create_socket(const char *portStr, int ai_family);
 
-connection_t connection_find(connection_t connList, struct sockaddr_in * addr, size_t addrLen);
-connection_t connection_new_incoming(connection_t connList, struct uiso_mbedtls_context_s * connection);
+connection_t connection_find(connection_t connList, struct sockaddr_in *addr, size_t addrLen);
+connection_t connection_new_incoming(connection_t connList,
+		struct uiso_mbedtls_context_s *connection);
 
-connection_t connection_create(connection_t connList, char * host, char * port, int protocol);
-
-
+connection_t connection_create(connection_t connList, char *host, char *port, int protocol);
 
 void connection_free(connection_t connList);
 
-int connection_send(connection_t connP, uint8_t * buffer, size_t length);
+int connection_send(connection_t connP, uint8_t *buffer, size_t length);
 
 #endif
