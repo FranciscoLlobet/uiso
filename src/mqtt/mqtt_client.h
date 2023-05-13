@@ -10,9 +10,17 @@
 
 #include "uiso.h"
 
-
+/**
+ * Returns mqtt client task handle
+ *
+ * @return mqtt client task handle
+ */
 TaskHandle_t get_mqtt_client_task_handle(void);
 
+/**
+ * Initializes the mqtt client
+ * @return
+ */
 int initialize_mqtt_client(void);
 
 

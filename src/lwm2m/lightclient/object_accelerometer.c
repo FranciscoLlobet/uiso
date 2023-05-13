@@ -188,6 +188,21 @@ uint8_t accel_discover(lwm2m_context_t *contextP, uint16_t instanceId,
 	return ret;
 }
 
+void free_accelerometer_object(lwm2m_object_t * accelerometer)
+{
+	if(accelerometer != NULL)
+	{
+		if(accelerometer->instanceList!= NULL)
+		{
+			lwm2m_free(accelerometer->instanceList);
+
+		}
+		lwm2m_free(accelerometer);
+	}
+
+
+}
+
 void* get_accelerometer_object(void)
 {
 	lwm2m_object_t *accelerometer = lwm2m_malloc(sizeof(lwm2m_object_t));

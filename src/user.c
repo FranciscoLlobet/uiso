@@ -20,6 +20,11 @@ SemaphoreHandle_t user_semaphore = NULL;
 extern int lwm2m_client_task_runner(void * param1);
 //extern void trigger_registration_update(void);
 
+TaskHandle_t get_user_task_handle(void)
+{
+	return user_task_handle;
+}
+
 void user_timer_callback( TimerHandle_t pxTimer )
 {
 	(void)pxTimer;
@@ -35,10 +40,24 @@ void clock_timer_callback( TimerHandle_t pxTimer )
 void user_task(void *param)
 {
 	(void) param;
-
+	int ret = -1;
 	vTaskSuspend(NULL);
 
-	lwm2m_client_task_runner(NULL);
+	do{
+
+		ret = lwm2m_client_task_runner(param);
+
+		BOARD_msDelay(60*1000); /* Retry in 1m */
+		// Wait for reconnection or registration update
+
+	}while(0 == ret);
+
+	BOARD_msDelay(2*60*1000); /* Wait for 2 minutes*/
+
+	NVIC_SystemReset();
+
+	// wait for connection to be established
+
 }
 
 void create_user_task(void)

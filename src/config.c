@@ -46,11 +46,13 @@ char* config_get_lwm2m_psk_key(void)
 	return (char*) &config_lwm2m_psk_key[0];
 }
 
+FATFS fs;
+
 void uiso_load_config(void)
 {
 	FSIZE_t fSize = 0;
 	FRESULT fRes = FR_OK;
-	FATFS fs;
+
 	UINT fRead = 0;
 	jsmn_parser parser;
 	jsmntok_t *json_tokens = NULL;
@@ -252,7 +254,7 @@ void uiso_load_config(void)
 
 	if (FR_OK == fRes)
 	{
-		fRes = f_unmount("SD");
+		//fRes = f_unmount("SD");
 	}
 	else
 	{

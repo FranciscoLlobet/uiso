@@ -26,14 +26,22 @@
 enum
 {
 	uiso_rtos_prio_idle = 0, /* Lowest priority. Reserved for idle task  */
-	uiso_rtos_prio_low = 1,
+	uiso_rtos_prio_low = 1, /* Temperature collector, sensor task*/
 	uiso_rtos_prio_below_normal = 2,
-	uiso_rtos_prio_normal = 3,
-	uiso_rtos_prio_above_normal = 4,
-	uiso_rtos_prio_high = 5, /* Very High priority. */
+	uiso_rtos_prio_normal = 3, /* lwm2m task, mqtt task, select task */
+	uiso_rtos_prio_above_normal = 4, /* Wifi service, SL Spawn */
+	uiso_rtos_prio_high = 5, /* Timer Service */
 	uiso_rtos_prio_highest = 6
 };
 
+/* New */
+
+
+/* LWM2M, MQTT */
+/* Select task */
+/* Wifi Service */
+/* SL Spawn */
+/* Timer */
 
 enum
 {

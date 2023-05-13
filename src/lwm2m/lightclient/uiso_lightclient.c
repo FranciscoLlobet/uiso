@@ -85,7 +85,7 @@ extern void free_security_object(lwm2m_object_t *objectP);
 extern char* get_server_uri(lwm2m_object_t *objectP, uint16_t secObjInstID);
 extern lwm2m_object_t* get_temperature_object(void);
 extern void free_test_object(lwm2m_object_t *object);
-
+extern void free_accelerometer_object(lwm2m_object_t *accelerometer);
 extern void* get_accelerometer_object(void);
 
 #define MAX_PACKET_SIZE			2048
@@ -544,10 +544,10 @@ int lwm2m_client_task_runner(void *param1)
 
 	free_security_object(objArray[0]);
 	free_server_object(objArray[1]);
-	free_object_device(objArray[2]);
-	free_object_device(objArray[3]);
-	free_object_device(objArray[4]);
-	//free_test_object(objArray[3]);
+	free_object_device(objArray[2]); /* Device object */
+	free_accelerometer_object(objArray[4]); /* Accelerometer */
+	//free_object_device(objArray[3]); /* Temperature */
+	//free_object_device(objArray[4]);
 
 	fprintf(stdout, "\r\n\n");
 

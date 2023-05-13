@@ -124,6 +124,9 @@ void publish_timer_callback(TimerHandle_t xTimer)
 
 int initialize_mqtt_client(void)
 {
+	/**
+	 * Create the MQTT client task.
+	 */
 	xTaskCreate(prvMQTTEchoTask,
 			"MQTTEcho0",
 			2048,
@@ -131,9 +134,10 @@ int initialize_mqtt_client(void)
 			MQTT_CLIENT_TASK_PRIORITY,
 			&mqtt_client_task);
 
+	/**
+	 * Create a publish timer.
+	 */
 	publish_timer = xTimerCreate("MQTT publish timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, publish_timer_callback);
-
-
 
 	return 0;
 }

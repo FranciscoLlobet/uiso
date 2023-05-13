@@ -194,6 +194,8 @@ int main(int argc, char *argv[])
 
 	VStartSimpleLinkSpawnTask((unsigned portBASE_TYPE)uiso_task_connectivity_service);
 
+	create_system_monitor();
+
 	vTaskStartScheduler();
 
 	return 0;
@@ -206,11 +208,13 @@ void vApplicationTickHook( void )
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask, char * pcTaskName )
 {
+	NVIC_SystemReset();
 	 asm volatile ("bkpt 0");
 }
 
 void vApplicationMallocFailedHook(void)
 {
+	NVIC_SystemReset();
 	 asm volatile ("bkpt 0");
 }
 
@@ -224,7 +228,7 @@ void vApplicationDaemonTaskStartupHook(void)
 
 void vApplicationIdleHook( void )
 {
-
+	// Application Idle Hook
 }
 
 

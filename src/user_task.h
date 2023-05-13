@@ -12,6 +12,9 @@
 
 void create_user_task(void);
 
+TaskHandle_t get_user_task_handle(void);
+
+
 extern TaskHandle_t user_task_handle;
 
 #endif /* USER_TASK_H_ */

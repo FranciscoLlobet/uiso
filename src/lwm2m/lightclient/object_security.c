@@ -287,10 +287,7 @@ void free_security_object(lwm2m_object_t * objectP)
     {
         security_instance_t * securityInstance = (security_instance_t *)objectP->instanceList;
         objectP->instanceList = objectP->instanceList->next;
-        if (NULL != securityInstance->uri)
-        {
-            lwm2m_free(securityInstance->uri);
-        }
+
         lwm2m_free(securityInstance);
     }
     lwm2m_free(objectP);
