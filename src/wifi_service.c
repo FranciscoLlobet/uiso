@@ -48,6 +48,9 @@ QueueHandle_t wifi_queue_handle = NULL;
 #define WIFI_RX_LWM2M_DATA			(1 << 13)
 #define WIFI_RX_MQTT_DATA			(1 << 14)
 #define WIFI_RX_HTTP_DATA			(1 << 15)
+
+
+
 #define WIFI_EVENT_MANAGER_TIMEOUT    (pdMS_TO_TICKS(24000))
 
 #define WIFI_NTP_SYNC_PERIOD		(12*3600*1000) /* Sync for at least one hour */
@@ -56,7 +59,8 @@ extern TaskHandle_t user_task_handle;
 
 enum wifi_connection_state_e
 {
-	wifi_initial = WIFI_INITIAL_STATE, wifi_disconnected = WIFI_DISCONNECTED_STATE, /* not connected */
+	wifi_initial = WIFI_INITIAL_STATE,
+	wifi_disconnected = WIFI_DISCONNECTED_STATE, /* not connected */
 	wifi_connecting = WIFI_CONNECTING_STATE, /* connection process starting */
 	wifi_connected = WIFI_CONNECTED_STATE, /* connected to access point */
 };
@@ -206,7 +210,13 @@ void wifi_task(void *param)
 			{
 				if (0 == sntp_is_synced())
 				{
+					/* Start NTP Syncing in 5s */
 					xTimerChangePeriod(sntp_sync_timer, (5 * 1000), portMAX_DELAY);
+				}
+				else
+				{
+					/* Redo NTP Syncing in 16s */
+					xTimerChangePeriod(sntp_sync_timer, (16 * 1000), portMAX_DELAY);
 				}
 
 				sl_iostream_printf(sl_iostream_swo_handle, "Wifi Connected %x\n\r",
@@ -227,6 +237,7 @@ void wifi_task(void *param)
 				vTaskSuspend(get_mqtt_client_task_handle());
 				sl_iostream_printf(sl_iostream_swo_handle, "Wifi Disconnected %x\n\r",
 						ulNotifiedValue);
+
 			}
 
 			if (ulNotifiedValue & (uint32_t) wifi_ip_v4_acquired)
@@ -302,7 +313,7 @@ void wifi_task(void *param)
 
 void create_wifi_service_task(void)
 {
-	xTaskCreate(wifi_task, "WifiService", configMINIMAL_STACK_SIZE + 1024, NULL,
+	xTaskCreate(wifi_task, "WifiService", 256, NULL,
 	WIFI_TASK_PRIORITY, &wifi_task_handle);
 
 	sntp_sync_timer = xTimerCreate("ntpService", 1000, pdTRUE, NULL, sntp_sync_timer_callback);

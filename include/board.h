@@ -290,6 +290,7 @@ void BOARD_SysTick_Disable(void);
 void BOARD_usDelay(uint32_t delay_in_us);
 void BOARD_msDelay(uint32_t delay_in_ms);
 
+/* SD CARD Functionality */
 void BOARD_SD_Card_Init(void);
 void BOARD_SD_Card_Enable(void);
 void BOARD_SD_Card_Disable(void);
@@ -300,6 +301,8 @@ void BOARD_SD_CARD_SetFastBaudrate(void);
 void BOARD_SD_CARD_SetSlowBaudrate(void);
 uint32_t BOARD_SD_CARD_Send(const void *buffer, int count);
 uint32_t BOARD_SD_CARD_Recieve(void *buffer, int count);
+uint32_t BOARD_SD_CARD_IsInserted(void);
+
 
 /* Button group */
 extern sl_button_t button1;
@@ -310,7 +313,7 @@ extern sl_led_t led_red;
 extern sl_led_t led_orange;
 extern sl_led_t led_yellow;
 
-/* SD Card group */
+/* SPI DRV Handles */
 extern SPIDRV_HandleData_t sd_card_usart;
 extern SPIDRV_HandleData_t cc3100_usart;
 

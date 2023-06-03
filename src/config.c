@@ -46,7 +46,7 @@ char* config_get_lwm2m_psk_key(void)
 	return (char*) &config_lwm2m_psk_key[0];
 }
 
-FATFS fs;
+extern FATFS fs;
 
 void uiso_load_config(void)
 {
@@ -254,7 +254,7 @@ void uiso_load_config(void)
 
 	if (FR_OK == fRes)
 	{
-		//fRes = f_unmount("SD");
+		fRes = f_unmount("SD");
 	}
 	else
 	{

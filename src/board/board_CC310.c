@@ -19,10 +19,9 @@ SPIDRV_HandleData_t cc3100_usart;
 
 SPIDRV_Init_t cc3100_usart_init_data =
 { .port = WIFI_SERIAL_PORT, .portLocation = _USART_ROUTE_LOCATION_LOC0,
-		.bitRate = WIFI_SPI_BAUDRATE, .frameLength = 8, .dummyTxValue = 0xFF,
-		.type = spidrvMaster, .bitOrder = spidrvBitOrderMsbFirst, .clockMode =
-				spidrvClockMode0, .csControl = spidrvCsControlApplication,
-		.slaveStartMode = spidrvSlaveStartImmediate,
+		.bitRate = WIFI_SPI_BAUDRATE, .frameLength = 8, .dummyTxValue = 0xFF, .type = spidrvMaster,
+		.bitOrder = spidrvBitOrderMsbFirst, .clockMode = spidrvClockMode0, .csControl =
+				spidrvCsControlApplication, .slaveStartMode = spidrvSlaveStartImmediate,
 
 };
 
@@ -46,8 +45,8 @@ static void cc3100_interrupt_callback(uint8_t intNo)
 	}
 }
 
-static void recieve_callback(struct SPIDRV_HandleData *handle,
-		Ecode_t transferStatus, int itemsTransferred)
+static void recieve_callback(struct SPIDRV_HandleData *handle, Ecode_t transferStatus,
+		int itemsTransferred)
 {
 	(void) handle; // Validate handle ?
 	struct transfer_status_s transfer_status_information =
@@ -57,16 +56,15 @@ static void recieve_callback(struct SPIDRV_HandleData *handle,
 
 	if (NULL != rx_semaphore)
 	{
-		xQueueSendFromISR(rx_semaphore, &transfer_status_information,
-				&xHigherPriorityTaskWoken);
+		xQueueSendFromISR(rx_semaphore, &transfer_status_information, &xHigherPriorityTaskWoken);
 
 		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	}
 
 }
 
-static void send_callback(struct SPIDRV_HandleData *handle,
-		Ecode_t transferStatus, int itemsTransferred)
+static void send_callback(struct SPIDRV_HandleData *handle, Ecode_t transferStatus,
+		int itemsTransferred)
 {
 	(void) handle; // Validate handle ?
 	struct transfer_status_s transfer_status_information =
@@ -76,8 +74,7 @@ static void send_callback(struct SPIDRV_HandleData *handle,
 
 	if (NULL != tx_semaphore)
 	{
-		xQueueSendFromISR(tx_semaphore, &transfer_status_information,
-				&xHigherPriorityTaskWoken);
+		xQueueSendFromISR(tx_semaphore, &transfer_status_information, &xHigherPriorityTaskWoken);
 
 		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	}
@@ -104,8 +101,7 @@ void Board_CC3100_Init(void)
 	WIFI_SPI0_MISO_MODE, 0);
 	GPIO_PinModeSet(WIFI_SPI0_MOSI_PORT, WIFI_SPI0_MOSI_PIN,
 	WIFI_SPI0_MOSI_MODE, 0);
-	GPIO_PinModeSet(WIFI_SPI0_SCK_PORT, WIFI_SPI0_SCK_PIN, WIFI_SPI0_SCK_MODE,
-			0);
+	GPIO_PinModeSet(WIFI_SPI0_SCK_PORT, WIFI_SPI0_SCK_PIN, WIFI_SPI0_SCK_MODE, 0);
 
 	GPIOINT_CallbackRegister(WIFI_INT_PIN, cc3100_interrupt_callback);
 
@@ -113,7 +109,7 @@ void Board_CC3100_Init(void)
 	WIFI_INT_PIN,
 	WIFI_INT_PIN,
 	true,
-	true,
+	false,
 	false);
 }
 
@@ -145,22 +141,22 @@ void CC3100_DeviceEnable(void)
 	GPIO_PinOutSet(WIFI_NHIB_PORT, WIFI_NHIB_PIN);
 	GPIO_PinModeSet(WIFI_INT_PORT, WIFI_INT_PIN, WIFI_INT_MODE, 0);
 	GPIO_ExtIntConfig(WIFI_INT_PORT,
-		WIFI_INT_PIN,
-		WIFI_INT_PIN,
-		true,
-		false,
-		true);
+	WIFI_INT_PIN,
+	WIFI_INT_PIN,
+	true,
+	false,
+	true);
 }
 
 void CC3100_DeviceDisable(void)
 {
 	GPIO_PinOutClear(WIFI_NHIB_PORT, WIFI_NHIB_PIN);
 	GPIO_ExtIntConfig(WIFI_INT_PORT,
-		WIFI_INT_PIN,
-		WIFI_INT_PIN,
-		true,
-		false,
-		false);
+	WIFI_INT_PIN,
+	WIFI_INT_PIN,
+	true,
+	false,
+	false);
 	BOARD_msDelay(1); // Very important (!)
 //	GPIO_PinModeSet(VDD_WIFI_EN_PORT, VDD_WIFI_EN_PIN, gpioModeDisabled, 0);
 //	GPIO_PinModeSet(WIFI_CSN_PORT, WIFI_CSN_PIN, gpioModeDisabled, 0);
@@ -170,31 +166,54 @@ void CC3100_DeviceDisable(void)
 //	GPIO_PinModeSet(WIFI_SPI0_MISO_PORT, WIFI_SPI0_MISO_PIN, gpioModeDisabled, 0);
 //	GPIO_PinModeSet(WIFI_SPI0_MOSI_PORT, WIFI_SPI0_MOSI_PIN, gpioModeDisabled, 0);
 //	GPIO_PinModeSet(WIFI_SPI0_SCK_PORT, WIFI_SPI0_SCK_PIN, gpioModeDisabled, 0);
+
+	if (NULL != tx_semaphore)
+	{
+		vQueueDelete(tx_semaphore);
+		tx_semaphore = NULL;
+	}
+	if (NULL != rx_semaphore)
+	{
+		vQueueDelete(rx_semaphore);
+		rx_semaphore = NULL;
+	}
 }
 
 int CC3100_IfOpen(char *pIfName, unsigned long flags)
 {
-	(void)pIfName;
-	(void)flags;
-	// Success: 0
+	(void) pIfName;
+	(void) flags;
+	int ret = -1;
+	// Success: FD (positive integer)
 	// Failure: -1
+	if (strncmp(pIfName, CC3100_DEVICE_NAME, strlen(CC3100_DEVICE_NAME)) == 0)
+	{
+		if (ECODE_OK == SPIDRV_Init(&cc3100_usart, &cc3100_usart_init_data))
+		{
+			GPIO_PinOutSet(WIFI_NHIB_PORT, WIFI_NHIB_PIN); // Clear Hybernate
+			BOARD_msDelay(50);
+			cc3100_spi_deselect();
+			ret = 1;
+		}
+	}
 
-	SPIDRV_Init(&cc3100_usart, &cc3100_usart_init_data);
-
-	GPIO_PinOutSet(WIFI_NHIB_PORT, WIFI_NHIB_PIN); // Clear Hybernate
-	BOARD_msDelay(50);
-	cc3100_spi_deselect();
-	return (int) 0;
+	return ret;
 }
 
 int CC3100_IfClose(Fd_t Fd)
 {
-	(void)Fd;
+	(void) Fd;
+	int ret = 0;
 	// Success: 0
 	// Failure; -1
 	cc3100_spi_deselect();
-	SPIDRV_DeInit(&cc3100_usart);
-	return 0;
+
+	if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(&cc3100_usart))
+	{
+		ret = -1;
+	}
+
+	return ret;
 }
 
 int CC3100_IfRead(Fd_t Fd, uint8_t *pBuff, int Len)
@@ -216,14 +235,12 @@ int CC3100_IfRead(Fd_t Fd, uint8_t *pBuff, int Len)
 			if (ECODE_EMDRV_SPIDRV_OK == transfer_status.transferStatus)
 			{
 				retVal = transfer_status.itemsTransferred;
-			}
-			else
+			} else
 			{
 				retVal = -1;
 			}
 		}
-	}
-	else
+	} else
 	{
 		ecode = SPIDRV_MReceiveB(&cc3100_usart, pBuff, Len);
 		if (ECODE_EMDRV_SPIDRV_OK == ecode)
@@ -256,14 +273,12 @@ int CC3100_IfWrite(Fd_t Fd, uint8_t *pBuff, int Len)
 			if (ECODE_EMDRV_SPIDRV_OK == transfer_status.transferStatus)
 			{
 				retVal = transfer_status.itemsTransferred;
-			}
-			else
+			} else
 			{
 				retVal = -1;
 			}
 		}
-	}
-	else
+	} else
 	{
 		ecode = SPIDRV_MTransmitB(&cc3100_usart, pBuff, Len);
 		if (ECODE_EMDRV_SPIDRV_OK == ecode)
@@ -297,19 +312,35 @@ void CC3100_GeneralEvtHdlr(SlDeviceEvent_t *slGeneralEvent)
 {
 	switch (slGeneralEvent->Event)
 	{
-	case SL_DEVICE_GENERAL_ERROR_EVENT:
-		// General Error
-	case SL_DEVICE_ABORT_ERROR_EVENT:
-	case SL_DEVICE_DRIVER_ASSERT_ERROR_EVENT:
-	case SL_DEVICE_DRIVER_TIMEOUT_CMD_COMPLETE:
-	case SL_DEVICE_DRIVER_TIMEOUT_SYNC_PATTERN:
-	case SL_DEVICE_DRIVER_TIMEOUT_ASYNC_EVENT:
-	default:
-		break;
+		case SL_DEVICE_GENERAL_ERROR_EVENT:
+			// General error event
+			 printf("General Error: Status=%d, Sender=%d\n",
+			               slGeneralEvent->EventData.deviceEvent.status,
+			               slGeneralEvent->EventData.deviceEvent.sender);
+			uiso_reset();
+			break;
+		case SL_DEVICE_ABORT_ERROR_EVENT:
+	        printf("Abort Error: AbortType=%d, AbortData=%d\n",
+	               slGeneralEvent->EventData.deviceReport.AbortType,
+	               slGeneralEvent->EventData.deviceReport.AbortData);
+			uiso_reset();
+	        break;
+		case SL_DEVICE_DRIVER_ASSERT_ERROR_EVENT:
+			 printf("Driver Assert Error Occurred.\n");
+            break;
+		case SL_DEVICE_DRIVER_TIMEOUT_CMD_COMPLETE:
+			printf("Driver Timeout: Command did not complete.\n");
+			break;
+		case SL_DEVICE_DRIVER_TIMEOUT_SYNC_PATTERN:
+			printf("Driver Timeout: Sync Pattern not received.\n");
+			break;
+		case SL_DEVICE_DRIVER_TIMEOUT_ASYNC_EVENT:
+			printf("Driver Timeout: Async event not received.\n");
+			break;
+		default:
+			break;
 	}
-
 }
-
 
 void CC3100_HttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 		SlHttpServerResponse_t *pSlHttpServerResponse)
@@ -320,11 +351,11 @@ void CC3100_SockEvtHdlr(SlSockEvent_t *pSlSockEvent)
 {
 	switch (pSlSockEvent->Event)
 	{
-	case SL_SOCKET_TX_FAILED_EVENT:
-		printf("tx failed\r\n");
-	case SL_SOCKET_ASYNC_EVENT:
-		printf("socket async event\r\n");
-	default:
-		break;
+		case SL_SOCKET_TX_FAILED_EVENT:
+			printf("tx failed\r\n");
+		case SL_SOCKET_ASYNC_EVENT:
+			printf("socket async event\r\n");
+		default:
+			break;
 	}
 }

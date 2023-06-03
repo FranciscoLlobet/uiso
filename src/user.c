@@ -54,7 +54,7 @@ void user_task(void *param)
 
 	BOARD_msDelay(2*60*1000); /* Wait for 2 minutes*/
 
-	NVIC_SystemReset();
+	uiso_reset();
 
 	// wait for connection to be established
 

@@ -54,5 +54,6 @@ enum
 	uiso_task_prio_hardware_service = uiso_rtos_prio_highest,
 };
 
+void uiso_reset(void);
 
 #endif /* UISO_H_ */

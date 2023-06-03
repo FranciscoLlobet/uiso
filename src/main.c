@@ -157,6 +157,7 @@ int main(int argc, char *argv[])
 	BOARD_SD_Card_Init();
 	Board_CC3100_Init();
 
+	/* Initialize I2C peripheral */
 	board_i2c_init();
 
 
@@ -240,6 +241,24 @@ SysTick_Handler(void)
 		xPortSysTickHandler();
 	}
 }
+
+static void _perform_reset(void* param1, uint32_t param2)
+{
+	(void)param1;
+	(void)param2;
+
+	taskENTER_CRITICAL();
+
+	CHIP_Reset();
+
+	taskEXIT_CRITICAL();
+}
+
+void uiso_reset(void)
+{
+	 (void)xTimerPendFunctionCall(_perform_reset, NULL, 0, portMAX_DELAY);
+}
+
 
 #include <sys/time.h>
 extern int _gettimeofday(struct timeval* ptimeval, void * ptimezone);

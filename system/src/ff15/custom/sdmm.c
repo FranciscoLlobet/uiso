@@ -38,16 +38,9 @@
 #include "board.h"
 
 
-#define	CS_H()		BOARD_SD_CARD_Deselect()
-#define CS_L()		BOARD_SD_CARD_Select()
-
-
-static
-void dly_us (UINT n)	/* Delay n microseconds (avr-gcc -Os) */
-{
-	BOARD_usDelay(n);
-}
-
+#define	CS_H()		      BOARD_SD_CARD_Deselect()
+#define CS_L()		      BOARD_SD_CARD_Select()
+#define dly_us( delay)    BOARD_usDelay(delay)
 
 
 /*--------------------------------------------------------------------------
@@ -94,28 +87,13 @@ DSTATUS Stat = STA_NOINIT;	/* Disk status */
 static volatile
 BYTE CardType;			/* b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing */
 
-SPIDRV_HandleData_t sd_card_usart;
-
-SPIDRV_Init_t sd_card_init_data = {
-		  .port = BOARD_SD_CARD_USART,
-		  .portLocation = _USART_ROUTE_LOCATION_LOC1,
-		  .bitRate = BOARD_SD_CARD_WAKEUP_BITRATE,
-		  .frameLength = 8,
-		  .dummyTxValue = 0xFF,
-		  .type = spidrvMaster,
-		  .bitOrder = spidrvBitOrderMsbFirst,
-		  .clockMode = spidrvClockMode0,
-		  .csControl = spidrvCsControlApplication,
-		  .slaveStartMode = spidrvSlaveStartImmediate,
-};
-
 static DSTATUS disk_disable(void);
 
 /*-----------------------------------------------------------------------*/
 /* Transmit bytes to the card (bitbanging)                               */
 /*-----------------------------------------------------------------------*/
 
-static
+static inline
 void xmit_mmc (
 	const BYTE* buff,	/* Data to be sent */
 	UINT bc				/* Number of bytes to send */
@@ -130,7 +108,7 @@ void xmit_mmc (
 /* Receive bytes from the card (bitbanging)                              */
 /*-----------------------------------------------------------------------*/
 
-static
+static inline
 void rcvr_mmc (
 	BYTE *buff,	/* Pointer to read buffer */
 	UINT bc		/* Number of bytes to receive */
@@ -320,15 +298,18 @@ DSTATUS disk_status (
 	BYTE drv			/* Drive number (always 0) */
 )
 {
-	if (drv)
+	if (0 != drv)
 	{
 		Stat |= STA_NOINIT;
 	}
 
-	/* Physical Medium detection */
-	if(1 == GPIO_PinInGet(SD_DETECT_PORT,SD_DETECT_PIN))
+	if(0 == BOARD_SD_CARD_IsInserted())
 	{
 		Stat |= STA_NODISK;
+	}
+	else
+	{
+		Stat &= ~STA_NODISK;
 	}
 
 	return Stat;
@@ -362,11 +343,22 @@ DSTATUS disk_initialize (
 	CS_H();		/* Initialize port pin tied to CS */
 
 	BOARD_SD_Card_Enable();
-	sd_card_init_data.bitRate = BOARD_SD_CARD_WAKEUP_BITRATE;
+
+	/* SPI DRV Init */
+	SPIDRV_Init_t sd_card_init_data = {
+			  .port = BOARD_SD_CARD_USART,
+			  .portLocation = _USART_ROUTE_LOCATION_LOC1,
+			  .bitRate = BOARD_SD_CARD_WAKEUP_BITRATE,
+			  .frameLength = 8,
+			  .dummyTxValue = 0xFF,
+			  .type = spidrvMaster,
+			  .bitOrder = spidrvBitOrderMsbFirst,
+			  .clockMode = spidrvClockMode0,
+			  .csControl = spidrvCsControlApplication,
+			  .slaveStartMode = spidrvSlaveStartImmediate,
+	};
 
 	SPIDRV_Init(&sd_card_usart, &sd_card_init_data);
-
-
 
 	rcvr_mmc(buf, 10);
 
@@ -416,12 +408,11 @@ DSTATUS disk_initialize (
 
 static DSTATUS disk_disable(void)
 {
-	(void)SPIDRV_DeInit(&sd_card_usart);
-	GPIO_PinOutSet(SD_CARD_CS_PORT, SD_CARD_CS_PIN);
-	GPIO_PinOutSet(SD_CARD_LS_PORT, SD_CARD_LS_PIN);
-    GPIO_PinModeSet(SD_CARD_SPI1_MISO_PORT, SD_CARD_SPI1_MISO_PIN, gpioModeDisabled, 0);
-    GPIO_PinModeSet(SD_CARD_SPI1_MOSI_PORT, SD_CARD_SPI1_MOSI_PIN, gpioModeDisabled, 0);
-    GPIO_PinModeSet(SD_CARD_SPI1_SCK_PORT, SD_CARD_SPI1_SCK_PIN, gpioModeDisabled, 0);
+	BOARD_SD_Card_Disable();
+
+	BOARD_msDelay(10);
+
+	BOARD_SD_Card_Init();
 
     return disk_status(0);
 }

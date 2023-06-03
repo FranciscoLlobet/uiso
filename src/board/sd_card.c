@@ -17,41 +17,37 @@
 
 #include "em_usart.h"
 
-enum SD_Card_Return_E {
-	SD_CARD_SUCCESS = 0,
-	SD_CARD_ERROR = 1,
-	SD_CARD_NOT_INSERTED,
-	SD_CARD_TIMEOUT
-};
+/* SPI DRV Handle */
+SPIDRV_HandleData_t sd_card_usart;
 
 /* Detect SD Card */
 static void card_detect_callback(uint8_t intNo);
 
-/**
- * Poll if card is inserted
- */
-static enum SD_Card_Return_E is_card_inserted(void);
+/* TX-RX Semaphores */
+static SemaphoreHandle_t tx_semaphore = NULL;
+static SemaphoreHandle_t rx_semaphore = NULL;
 
-/**
- * Wait for card to be ready
- */
-static enum SD_Card_Return_E wait_for_card_to_be_ready(void);
 
+uint32_t BOARD_SD_CARD_IsInserted(void)
+{
+	if(0 == GPIO_PinInGet(SD_DETECT_PORT,SD_DETECT_PIN))
+	{
+		sl_led_turn_on(&led_yellow);
+		return 1;
+	}
+	else
+	{
+		sl_led_turn_off(&led_yellow);
+	}
+
+	return 0;
+}
 
 
 static void card_detect_callback(uint8_t intNo)
 {
 	(void)intNo;
-	if(0 == GPIO_PinInGet(SD_DETECT_PORT,SD_DETECT_PIN))
-	{
-		// SD Card inserted
-		sl_led_turn_on(&led_yellow);
-	}
-	else
-	{
-		// Disconnect SD Card
-		sl_led_turn_off(&led_yellow);
-	}
+	(void)BOARD_SD_CARD_IsInserted();
 }
 
 
@@ -71,12 +67,11 @@ void BOARD_SD_Card_Init(void)
 					  SD_DETECT_PIN,
                       true,
                       true,
-                      true);
-}
+                      false);
 
-// Mutex
-static SemaphoreHandle_t tx_semaphore = NULL;
-static SemaphoreHandle_t rx_semaphore = NULL;
+    sl_led_turn_off(&led_yellow);
+
+}
 
 void BOARD_SD_Card_Enable(void)
 {
@@ -90,18 +85,38 @@ void BOARD_SD_Card_Enable(void)
 		rx_semaphore = xQueueCreate( 1, sizeof(Ecode_t) );
 	}
 
+    GPIOINT_CallbackRegister(SD_DETECT_PIN, card_detect_callback);
+
+    GPIO_ExtIntConfig(SD_DETECT_PORT,
+    				  SD_DETECT_PIN,
+					  SD_DETECT_PIN,
+                      true,
+                      true,
+                      true);
+
+    (void)BOARD_SD_CARD_IsInserted();
 }
 
 void BOARD_SD_Card_Disable(void)
 {
-	SPIDRV_DeInit(&sd_card_usart);
+	(void)SPIDRV_DeInit(&sd_card_usart);
 
 	GPIO_PinModeSet(SD_CARD_CS_PORT, SD_CARD_CS_PIN, gpioModeDisabled, 1);
 	GPIO_PinModeSet(SD_CARD_LS_PORT, SD_CARD_CS_PIN, gpioModeDisabled, 1);
-	GPIO_PinModeSet(SD_DETECT_PORT, SD_DETECT_PIN, gpioModeDisabled, 0);
+	GPIO_PinModeSet(SD_DETECT_PORT, SD_DETECT_PIN, SD_DETECT_MODE, 1);
+	//GPIO_PinModeSet(SD_DETECT_PORT, SD_DETECT_PIN, gpioModeDisabled, 0);
 	GPIO_PinModeSet(SD_CARD_SPI1_MISO_PORT, SD_CARD_SPI1_MISO_PIN, gpioModeDisabled, 0);
 	GPIO_PinModeSet(SD_CARD_SPI1_MOSI_PORT, SD_CARD_SPI1_MOSI_PIN, gpioModeDisabled, 0);
 	GPIO_PinModeSet(SD_CARD_SPI1_SCK_PORT, SD_CARD_SPI1_SCK_PIN, gpioModeDisabled,0);
+
+    GPIO_ExtIntConfig(SD_DETECT_PORT,
+    				  SD_DETECT_PIN,
+					  SD_DETECT_PIN,
+                      false,
+                      false,
+                      false);
+
+    sl_led_turn_off(&led_yellow);
 }
 
 
@@ -195,49 +210,6 @@ uint32_t BOARD_SD_CARD_Send(const void * buffer, int count)
 
 	return (uint32_t)ecode;
 }
-
-#if 0
-
-static enum SD_Card_Return_E wait_for_card_to_be_ready(void)
-{
-	enum SD_Card_Return_E returnValue = SD_CARD_TIMEOUT;
-
-	uint8_t rxValue = 0;
-
-	/* Card should be available in 500ms*/
-	for(uint32_t cycles = (uint32_t)WAIT_CYCLES; cycles>0; cycles--)
-	{
-		if(ECODE_EMDRV_SPIDRV_OK == SPIDRV_MTransferSingleItemB(&sd_card_usart, UINT32_C(0), &rxValue))
-		{
-			if(0xFF == rxValue)
-			{
-				return SD_CARD_SUCCESS;
-			}
-		}
-		else
-		{
-			return SD_CARD_ERROR;
-		}
-	}
-
-	return returnValue;
-}
-
-static enum SD_Card_Return_E is_card_inserted(void)
-{
-	enum SD_Card_Return_E value = SD_CARD_NOT_INSERTED;
-
-	if(0 == GPIO_PinInGet(SD_DETECT_PORT,SD_DETECT_PIN))
-	{
-		value = SD_CARD_SUCCESS;
-	}
-
-	return value;
-}
-
-#endif
-
-
 
 
 #include "sl_sleeptimer.h"
