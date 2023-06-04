@@ -32,19 +32,6 @@
 #include "diag/trace.h"
 #include "timer.h"
 
-// ----------------------------------------------------------------------------
-//
-// Print a greeting message on the trace device and enter a loop
-// to count seconds.
-//
-// Trace support is enabled by adding the TRACE macro definition.
-// By default the trace messages are forwarded to the ITM output,
-// but can be rerouted to any device or completely suppressed, by
-// changing the definitions required in system/src/diag/trace-impl.c
-// (currently OS_USE_TRACE_ITM, OS_USE_TRACE_SEMIHOSTING_DEBUG/_STDOUT).
-//
-// ----------------------------------------------------------------------------
-
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
 #pragma GCC diagnostic push
@@ -56,27 +43,8 @@
 #include "board.h"
 #include "uiso.h"
 
-
-/* Silicon Labs Drivers */
-#include "sl_iostream_debug.h"
-#include "sl_debug_swo.h"
-#include "sl_iostream_swo.h"
-#include "sl_sleeptimer.h"
-#include "sl_power_manager.h"
-#include "dmadrv.h"
-
-
-/* Silicon Labs Device Initializations */
-#include "sl_device_init_emu.h"
-#include "sl_device_init_nvic.h"
-#include "sl_device_init_hfxo.h"
-#include "sl_device_init_hfrco.h"
-#include "sl_device_init_lfxo.h"
-
 #define JSMN_STATIC
 #include "uiso_config.h"
-//#include "ff.h"
-//#include "diskio.h"
 
 #include "simplelink.h"
 #include "mbedtls/ssl.h"
@@ -86,99 +54,7 @@ int main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	CHIP_Init();
-	MSC_Init();
-
-	sl_device_init_nvic();
-	sl_device_init_hfxo();
-	sl_device_init_hfrco();
-	sl_device_init_lfxo();
-	sl_device_init_emu();
-
-	NVIC_SetPriorityGrouping((uint32_t) 3);/* Set priority grouping to group 4*/
-
-	/* Set core NVIC priorities */
-	NVIC_SetPriority(SVCall_IRQn, 0);
-	NVIC_SetPriority(DebugMonitor_IRQn, 0);
-	NVIC_SetPriority(PendSV_IRQn, 0);
-	NVIC_SetPriority(SysTick_IRQn, 0);
-
-	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO);
-	CMU_OscillatorEnable(cmuOsc_HFRCO, false, false);
-	CMU_ClockEnable(cmuClock_HFPER, true);
-	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
-	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
-	CMU_ClockEnable(cmuClock_HFLE, true);
-
-	/* ENABLE SWO */
-	sl_debug_swo_init();
-
-	sl_iostream_swo_init(); // Send printf to swo
-
-	/* */
-	CMU_ClockEnable(cmuClock_GPIO, true);
-
-	{
-		/* Setup Interrupts */
-		NVIC_SetPriority(GPIO_ODD_IRQn, 5);
-		NVIC_SetPriority(GPIO_EVEN_IRQn, 5);
-
-		GPIOINT_Init();
-	}
-
-	/* Wifi NRSET port */
-	GPIO_PinModeSet(gpioPortA, 15, gpioModeWiredAnd, 0);
-
-	/* Enable 2v5 */
-	GPIO_PinModeSet(gpioPortF, 5, gpioModeWiredOr, 0);
-
-	/* Enable 3v3 supply */
-	GPIO_PinModeSet(gpioPortC, 11, gpioModePushPull, 0);
-
-	GPIO_DriveModeSet(gpioPortE, gpioDriveModeLow);
-	GPIO_DriveModeSet(gpioPortD, gpioDriveModeHigh);
-
-	GPIO_PinOutClear(PWR_2V5_SNOOZE_PORT, PWR_2V5_SNOOZE_PIN);
-	GPIO_PinOutSet(PWR_3V3_EN_PORT, PWR_3V3_EN_PIN);
-
-	/* LED Set Group */
-	sl_led_init(&led_red);
-	sl_led_init(&led_orange);
-	sl_led_init(&led_yellow);
-
-	/* BUTTON Set Group */
-	sl_button_init(&button1);
-	sl_button_init(&button2);
-
-	DMADRV_Init();
-
-	/* Initialize SPI peripherals */
-	BOARD_SD_Card_Init();
-	Board_CC3100_Init();
-
-	/* Initialize I2C peripheral */
-	board_i2c_init();
-
-
-	SysTick_Config(SystemCoreClock / TIMER_FREQUENCY_HZ);
-
-	/* Start Services */
-	sl_power_manager_init();
-
-	sl_sleeptimer_date_t date;
-
-	(void)sl_sleeptimer_build_datetime(
-			&date,
-			(2022 - 1900), /* DEFAULT YEAR */
-            MONTH_NOVEMBER, /* DEFAULT MONTH */
-			11, /* DEFAULT DAY */
-            10, /* DEFAULT HOUR */
-            0, /* DEFAULT MINUTES */
-            0, /* DEFAULT SECONDS */
-            1); /* DEFAULT TZ */
-
-	(void)sl_sleeptimer_set_datetime(&date);
+	BOARD_Init();
 
 	//create_user_task();
 	sl_iostream_printf(sl_iostream_swo_handle, "Starting FreeRTOS\n\r");
@@ -196,6 +72,8 @@ int main(int argc, char *argv[])
 	VStartSimpleLinkSpawnTask((unsigned portBASE_TYPE)uiso_task_connectivity_service);
 
 	create_system_monitor();
+
+	BOARD_Watchdog_Enable();
 
 	vTaskStartScheduler();
 
@@ -225,13 +103,36 @@ void vApplicationDaemonTaskStartupHook(void)
 
 	uiso_load_config();
 
+	sl_led_turn_on(&led_red);
+
+	BOARD_msDelay(500);
+
+	sl_led_turn_on(&led_orange);
+
+	BOARD_msDelay(500);
+
+	sl_led_turn_on(&led_yellow);
+
+	BOARD_msDelay(500);
+
+	sl_led_turn_off(&led_red);
+
+	BOARD_msDelay(500);
+
+	sl_led_turn_off(&led_orange);
+
+	BOARD_msDelay(500);
+
+	sl_led_turn_off(&led_yellow);
 }
 
 void vApplicationIdleHook( void )
 {
-	// Application Idle Hook
+	BOARD_Watchdog_Feed();
 }
 
+
+extern void xPortSysTickHandler( void );
 
 void __attribute__ ((section(".after_vectors")))
 SysTick_Handler(void)
@@ -247,16 +148,34 @@ static void _perform_reset(void* param1, uint32_t param2)
 	(void)param1;
 	(void)param2;
 
+	sl_led_turn_on(&led_red);
+	sl_led_turn_on(&led_yellow);
+	sl_led_turn_on(&led_orange);
+
+	/* Here we are currently in the Timer service routine. */
+
+	// ... Do some Board deinitialization things...
+
+
+	/* Enter the critical section */
 	taskENTER_CRITICAL();
 
-	CHIP_Reset();
+	BOARD_MCU_Reset();
 
-	taskEXIT_CRITICAL();
+	taskEXIT_CRITICAL(); /* Unreachable */
 }
 
 void uiso_reset(void)
 {
-	 (void)xTimerPendFunctionCall(_perform_reset, NULL, 0, portMAX_DELAY);
+	 if(pdTRUE != xTimerPendFunctionCall(_perform_reset, NULL, 0, portMAX_DELAY))
+	 {
+		 // If the reset callback cannot be enqueued, then the reset shall be performed immediately.
+		 taskENTER_CRITICAL();
+
+		 BOARD_MCU_Reset();
+
+		 taskEXIT_CRITICAL();
+	 }
 }
 
 

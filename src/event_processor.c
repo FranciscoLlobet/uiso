@@ -7,28 +7,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-// Events
-enum{
-	/* Group 1: Buttons*/
-	EVENT_BUTTON1_PRESS,
-	EVENT_BUTTON1_RELEASE,
-
-	EVENT_BUTTON2_PRESS,
-	EVENT_BUTTON2_RELEASE,
-
-	/* Group 2: SD Card*/
-	EVENT_SD_CARD_INSERTED,
-	EVENT_SD_CARD_REMOVED,
-
-	/* Group 3: Wifi HW */
-
-	/* Group 4: Sensors */
-
-	/* Group 5: Wifi Connectivity */
+#include "uiso_events.h"
 
 
-	/* Group 6: */
-};
 
 
 

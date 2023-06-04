@@ -14,6 +14,8 @@
 #define SL_I2CSPM_INSTANCE_HLR i2cClockHLRAsymetric
 #define SL_I2CSPM_INSTANCE_MAX_FREQ I2C_FREQ_FAST_MAX
 
+#define BOARD_I2C_SENSORS_I2C_TIMEOUT_MS	(10000)
+
 I2CSPM_Init_TypeDef init_i2c0 =
 { .port = SL_I2CSPM_INSTANCE_PERIPHERAL, .sclPort = SL_I2CSPM_INSTANCE_SCL_PORT,
 		.sclPin = SL_I2CSPM_INSTANCE_SCL_PIN, .sdaPort =
@@ -92,7 +94,7 @@ I2C_TransferReturn_TypeDef board_i2c0_transfer(I2C_TransferSeq_TypeDef *seq)
 {
 	I2C_TransferReturn_TypeDef ret = i2cTransferSwFault;
 
-	if(pdFALSE == xSemaphoreTake( board_i2c_os_control.i2c0_mutex, 1000))
+	if(pdFALSE == xSemaphoreTake( board_i2c_os_control.i2c0_mutex, pdMS_TO_TICKS(BOARD_I2C_SENSORS_I2C_TIMEOUT_MS)))
 	{
 		return i2cTransferSwFault;
 	}

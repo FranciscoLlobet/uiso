@@ -11,7 +11,6 @@
 #include "user.h"
 void Board_CC3100_Init(void);
 
-
 void CC3100_DeviceEnablePreamble(void);
 void CC3100_DeviceEnable(void);
 void CC3100_DeviceDisable(void);

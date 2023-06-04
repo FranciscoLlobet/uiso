@@ -10,19 +10,12 @@
 / * Redistributions of source code must retain the above copyright notice.
 /
 /-------------------------------------------------------------------------/
-  Features and Limitations:
 
-  * Easy to Port Bit-banging SPI
-    It uses only four GPIO pins. No complex peripheral needs to be used.
+MODIFICATIONS:
 
-  * Platform Independent
-    You need to modify only a few macros to control the GPIO port.
+  UISO, 2022-2023
 
-  * Low Speed
-    The data transfer rate will be several times slower than hardware SPI.
-
-  * No Media Change Detection
-    Application program needs to perform a f_mount() after media change.
+  Modifications to add simplified logic to interface with the board
 
 /-------------------------------------------------------------------------*/
 
@@ -90,33 +83,15 @@ BYTE CardType;			/* b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing */
 static DSTATUS disk_disable(void);
 
 /*-----------------------------------------------------------------------*/
-/* Transmit bytes to the card (bitbanging)                               */
+/* Transmit bytes to the card                                            */
 /*-----------------------------------------------------------------------*/
 
-static inline
-void xmit_mmc (
-	const BYTE* buff,	/* Data to be sent */
-	UINT bc				/* Number of bytes to send */
-)
-{
-	(void)BOARD_SD_CARD_Send(buff, bc);
-}
-
-
+#define xmit_mmc( buff , bc ) (void)BOARD_SD_CARD_Send(buff, bc)
 
 /*-----------------------------------------------------------------------*/
 /* Receive bytes from the card (bitbanging)                              */
 /*-----------------------------------------------------------------------*/
-
-static inline
-void rcvr_mmc (
-	BYTE *buff,	/* Pointer to read buffer */
-	UINT bc		/* Number of bytes to receive */
-)
-{
-	(void)BOARD_SD_CARD_Recieve(buff, bc);
-}
-
+#define rcvr_mmc( buff, bc ) (void)BOARD_SD_CARD_Recieve(buff, bc)
 
 
 /*-----------------------------------------------------------------------*/

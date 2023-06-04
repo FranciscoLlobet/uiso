@@ -11,7 +11,8 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-/* Convert to struct ? */
+#define BOARD_CC3100_FD		((int)INT32_C(1))
+
 static SemaphoreHandle_t tx_semaphore = NULL;
 static SemaphoreHandle_t rx_semaphore = NULL;
 
@@ -27,7 +28,6 @@ SPIDRV_Init_t cc3100_usart_init_data =
 
 struct transfer_status_s
 {
-	//struct SPIDRV_HandleData_t * handle;
 	Ecode_t transferStatus; // status
 	int itemsTransferred; // items_transferred
 };
@@ -50,17 +50,16 @@ static void recieve_callback(struct SPIDRV_HandleData *handle, Ecode_t transferS
 {
 	(void) handle; // Validate handle ?
 	struct transfer_status_s transfer_status_information =
-	{ transferStatus, itemsTransferred };
+	{ .transferStatus = transferStatus, .itemsTransferred = itemsTransferred };
 
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	if (NULL != rx_semaphore)
 	{
-		xQueueSendFromISR(rx_semaphore, &transfer_status_information, &xHigherPriorityTaskWoken);
-
-		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+		(void)xQueueSendFromISR(rx_semaphore, &transfer_status_information, &xHigherPriorityTaskWoken);
 	}
 
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 static void send_callback(struct SPIDRV_HandleData *handle, Ecode_t transferStatus,
@@ -68,16 +67,16 @@ static void send_callback(struct SPIDRV_HandleData *handle, Ecode_t transferStat
 {
 	(void) handle; // Validate handle ?
 	struct transfer_status_s transfer_status_information =
-	{ transferStatus, itemsTransferred };
+	{ .transferStatus = transferStatus, .itemsTransferred = itemsTransferred };
 
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	if (NULL != tx_semaphore)
 	{
-		xQueueSendFromISR(tx_semaphore, &transfer_status_information, &xHigherPriorityTaskWoken);
-
-		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+		(void)xQueueSendFromISR(tx_semaphore, &transfer_status_information, &xHigherPriorityTaskWoken);
 	}
+
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 static void cc3100_spi_select(void)
@@ -193,7 +192,7 @@ int CC3100_IfOpen(char *pIfName, unsigned long flags)
 			GPIO_PinOutSet(WIFI_NHIB_PORT, WIFI_NHIB_PIN); // Clear Hybernate
 			BOARD_msDelay(50);
 			cc3100_spi_deselect();
-			ret = 1;
+			ret = BOARD_CC3100_FD;
 		}
 	}
 
@@ -202,10 +201,13 @@ int CC3100_IfOpen(char *pIfName, unsigned long flags)
 
 int CC3100_IfClose(Fd_t Fd)
 {
-	(void) Fd;
 	int ret = 0;
-	// Success: 0
-	// Failure; -1
+
+	if(BOARD_CC3100_FD != Fd)
+	{
+		ret = -1;
+	}
+
 	cc3100_spi_deselect();
 
 	if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(&cc3100_usart))
@@ -218,7 +220,11 @@ int CC3100_IfClose(Fd_t Fd)
 
 int CC3100_IfRead(Fd_t Fd, uint8_t *pBuff, int Len)
 {
-	(void) Fd;
+	if((NULL == pBuff) || (Len <= 0) || (BOARD_CC3100_FD != Fd))
+	{
+		return -1;
+	}
+
 	int retVal = -1;
 	struct transfer_status_s transfer_status =
 	{ ECODE_EMDRV_SPIDRV_PARAM_ERROR, 0 };
@@ -256,7 +262,11 @@ int CC3100_IfRead(Fd_t Fd, uint8_t *pBuff, int Len)
 
 int CC3100_IfWrite(Fd_t Fd, uint8_t *pBuff, int Len)
 {
-	(void) Fd;
+	if((NULL == pBuff) || (Len <= 0) || (BOARD_CC3100_FD != Fd))
+	{
+		return -1;
+	}
+
 	int retVal = -1;
 	struct transfer_status_s transfer_status =
 	{ ECODE_EMDRV_SPIDRV_PARAM_ERROR, 0 };
@@ -310,6 +320,11 @@ CC3100_UnmaskIntHdlr(void)
 /* General Event Handler */
 void CC3100_GeneralEvtHdlr(SlDeviceEvent_t *slGeneralEvent)
 {
+	if(NULL == slGeneralEvent)
+	{
+		return;
+	}
+
 	switch (slGeneralEvent->Event)
 	{
 		case SL_DEVICE_GENERAL_ERROR_EVENT:
@@ -345,16 +360,24 @@ void CC3100_GeneralEvtHdlr(SlDeviceEvent_t *slGeneralEvent)
 void CC3100_HttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 		SlHttpServerResponse_t *pSlHttpServerResponse)
 {
-	;
+	(void)pSlHttpServerEvent;
+	(void)pSlHttpServerResponse;
 }
 void CC3100_SockEvtHdlr(SlSockEvent_t *pSlSockEvent)
 {
+	if(pSlSockEvent == NULL)
+	{
+		return;
+	}
+
 	switch (pSlSockEvent->Event)
 	{
 		case SL_SOCKET_TX_FAILED_EVENT:
 			printf("tx failed\r\n");
+			break;
 		case SL_SOCKET_ASYNC_EVENT:
 			printf("socket async event\r\n");
+			break;
 		default:
 			break;
 	}

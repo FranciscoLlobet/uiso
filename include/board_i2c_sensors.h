@@ -27,8 +27,6 @@ extern struct bmg160_t board_bmg160;
 extern struct bmi160_dev board_bmi160;
 extern struct bmm150_dev board_bmm150;
 
-
-
 void board_i2c_init(void);
 
 void board_bma280_enable(void);

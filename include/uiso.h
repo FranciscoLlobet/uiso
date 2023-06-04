@@ -54,6 +54,11 @@ enum
 	uiso_task_prio_hardware_service = uiso_rtos_prio_highest,
 };
 
+/**
+ * Application system reset
+ *
+ * This call is asynchronous. It enqueues a system reset request to the Timer Service task.
+ */
 void uiso_reset(void);
 
 #endif /* UISO_H_ */
